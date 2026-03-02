@@ -1,0 +1,15 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "FICup",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Ficup",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "categories": [
+    "games"
+  ],
+  "description": "App di fantacalcio"
+}
