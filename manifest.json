@@ -4,9 +4,8 @@
   "display": "standalone",
   "name": "ficup26.github",
   "orientation": "any",
-  "scope": "/",
-  "short_name": "ficup26.github",
-  "start_url": "/",
+  "scope": "./",
+  "start_url": "./index.html",
   "theme_color": "#ffffff",
   "categories": [
     "games"
