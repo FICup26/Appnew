@@ -2,14 +2,20 @@
   "background_color": "#ffffff",
   "dir": "ltr",
   "display": "standalone",
-  "name": "FICup",
+  "name": "ficup26.github",
   "orientation": "any",
   "scope": "/",
-  "short_name": "Ficup",
+  "short_name": "ficup26.github",
   "start_url": "/",
   "theme_color": "#ffffff",
   "categories": [
     "games"
   ],
-  "description": "App di fantacalcio"
+  "icons": [
+    {
+      "src": "ficup (1).png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
