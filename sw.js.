@@ -1,0 +1,1 @@
+self.addEventListener('fetch', () => {}); (copia e incolla, non serve capire cosa fa, serve solo a "ingannare" il telefono e fargli credere che sia un'app vera).
