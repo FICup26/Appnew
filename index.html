@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FICup 26/27 | Official App</title>
+
     <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Ficup 26">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Ficup 26">
+    <link rel="apple-touch-icon" href="ficup (1).png">
 
-<link rel="apple-touch-icon" href="ficup (1).png">
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
-
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('SW registrato!', reg))
+            .catch(err => console.log('Errore SW', err));
+        });
+      }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FICup 26/27 | Official App</title>
@@ -1409,10 +1417,39 @@ document.addEventListener('DOMContentLoaded', () => {
             caricaPronosticiCompleti(); 
         }
     }
+    // ... dopo il pezzo dei Pronostici, aggiungi questi:
 
-
-    if (typeof toggleSidebar === 'function') toggleSidebar();
+else if (name === 'Fanta') {
+    if (wipContent) {
+        wipContent.style.setProperty('display', 'flex', 'important'); // Mostra il contenitore
+        if (title) title.innerText = "FANTACALCIO"; // Imposta il titolo
+        
+        // Nascondi tutto il resto
+        if (homeContent) homeContent.style.display = 'none';
+        extraHome.forEach(el => el.style.setProperty('display', 'none', 'important'));
+        window.scrollTo(0, 0);
+    }
 }
+
+else if (name === 'Azioni') {
+    if (wipContent) {
+        wipContent.style.setProperty('display', 'flex', 'important');
+        if (title) title.innerText = "AZIONI RAPIDE";
+        
+        if (homeContent) homeContent.style.display = 'none';
+        extraHome.forEach(el => el.style.setProperty('display', 'none', 'important'));
+        window.scrollTo(0, 0);
+    }
+}
+
+
+
+       // SOSTITUISCI LE ULTIME RIGHE CON QUESTE:
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('open')) {
+        toggleSidebar(); 
+    }
+} // <--- Fine della funzione showSection
 
 
 
