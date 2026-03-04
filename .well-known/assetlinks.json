@@ -1,8 +1,15 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "io.github.ficup26.twa",
-    "sha256_cert_fingerprints": ["27:FE:19:42:3F:0F:8A:2D:5F:D0:02:23:0D:1C:0D:40:17:6C:95:5A:71:8D:17:8F:36:A6:BF:D9:B8:8B:2D:F7"]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.ficup26.twa",
+      "sha256_cert_fingerprints": [
+        "27:FE:19:42:3F:0F:8A:2D:5F:D0:02:23:0D:1C:0D:40:17:6C:95:5A:71:8D:17:8F:36:A6:BF:D9:B8:8B:2D:F7",
+        "CD:F7:E1:52:56:DE:75:8B:8B:17:83:D8:C5:8C:C5:3B:17:53:E6:94:01:B5:49:01:3F:16:69:58:07:8F:0C:84"
+      ]
+    }
   }
-}]
+]
