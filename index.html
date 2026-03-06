@@ -1594,13 +1594,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    else if (name === 'Pronostici') {
+        else if (name === 'Pronostici') {
         if (wipContent) {
             wipContent.style.setProperty('display', 'block', 'important');
-            wipContent.innerHTML = `<div class="max-w-md mx-auto px-4 py-8"><h2 class="text-2xl font-black text-center text-blue-800 mb-2 uppercase">I Pronostici</h2><div id="lista-pronostici">Sincronizzazione...</div><button onclick="showSection('Home')" class="mt-10 mb-20 w-full bg-gray-800 text-white py-4 rounded-2xl font-bold">TORNA ALLA HOME</button></div>`;
-            caricaPronosticiCompleti(); 
+            wipContent.style.minHeight = '100vh';
+            wipContent.style.backgroundColor = '#f8fafc';
+
+            // Dobbiamo rimettere l'HTML completo che la funzione si aspetta
+            wipContent.innerHTML = `
+                <div class="max-w-md mx-auto px-4 py-8">
+                    <h2 class="text-2xl font-black text-center text-blue-800 mb-2 uppercase italic">I Pronostici</h2>
+                    
+                    <div class="flex items-center justify-center gap-3 mb-6 bg-white p-3 rounded-2xl shadow-sm border border-blue-50">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">Filtra:</label>
+                        <select id="select-giornata" onchange="caricaPronosticiCompleti(this.value)" class="bg-transparent font-black text-blue-700 outline-none">
+                            <option value="">Caricamento...</option>
+                            ${Array.from({length: 38}, (_, i) => `<option value="${i+1}">Giornata ${i+1}</option>`).join('')}
+                        </select>
+                    </div>
+                    
+                    <div id="statistiche-pronostici" class="mb-4 text-center"></div>
+                    <div id="lista-pronostici" class="space-y-4 text-center py-10 text-blue-500 font-bold">
+                        <i class="fas fa-spinner animate-spin mr-2"></i> Sincronizzazione in corso...
+                    </div>
+
+                    <button onclick="showSection('Home')" class="mt-10 mb-20 w-full bg-gray-800 text-white py-4 rounded-2xl font-bold shadow-lg">
+                        TORNA ALLA HOME
+                    </button>
+                </div>
+            `;
+            
+            // Ora che gli ID 'select-giornata' e 'lista-pronostici' esistono nel DOM, chiamiamo il fetch
+            if (typeof caricaPronosticiCompleti === "function") {
+                caricaPronosticiCompleti(); 
+            } else {
+                console.error("Errore: la funzione caricaPronosticiCompleti non esiste!");
+            }
         }
     }
+
 
     else if (name === 'Fanta' || name === 'Azioni') {
         if (wipContent) {
@@ -2448,114 +2480,131 @@ async function caricaPronosticiCompleti(giornataScelta = null) {
         }
 
         if (dati) {
-           // --- 3. LOGICA GIORNATA AUTOMATICA ---
-// Cambiamo il controllo: si attiva SOLO se giornataScelta è esattamente null o undefined
-if (giornataScelta === null || giornataScelta === undefined) {
-    const oggi = new Date();
-    oggi.setHours(0, 0, 0, 0);
+            // --- LOGICA GIORNATA AUTOMATICA ---
+            if (giornataScelta === null || giornataScelta === undefined) {
+                const oggi = new Date();
+                oggi.setHours(0, 0, 0, 0);
 
-    const prossimaPartita = dati.partite.find(m => {
-        if (!m.data || !m.data.includes('/')) return false;
-        const parti = m.data.split('/');
-        const dataPartita = new Date(parti[2], parti[1] - 1, parti[0]);
-        return dataPartita >= oggi;
-    });
+                const prossimaPartita = dati.partite.find(m => {
+                    if (!m.data || !m.data.includes('/')) return false;
+                    const parti = m.data.split('/');
+                    const dataPartita = new Date(parti[2], parti[1] - 1, parti[0]);
+                    return dataPartita >= oggi;
+                });
 
-    if (prossimaPartita) {
-        giornataScelta = prossimaPartita.giornata;
-    } else {
-        const giocate = dati.partite.filter(p => p.esito !== "");
-        giornataScelta = giocate.length > 0 ? giocate[giocate.length - 1].giornata : dati.partite[0].giornata;
-    }
-    
-    // Aggiorna la select visivamente
-    if (selectGiornata) selectGiornata.value = giornataScelta;
-}
+                if (prossimaPartita) {
+                    giornataScelta = prossimaPartita.giornata;
+                } else {
+                    const giocate = dati.partite.filter(p => p.esito !== "");
+                    giornataScelta = giocate.length > 0 ? giocate[giocate.length - 1].giornata : dati.partite[0].giornata;
+                }
+                if (selectGiornata) selectGiornata.value = giornataScelta;
+            }
 
-
-            // --- 4. FILTRAGGIO ---
+            // --- FILTRAGGIO ---
             let elencoPartite = [...dati.partite];
             if (giornataScelta !== "tutte" && giornataScelta !== "") {
                 elencoPartite = elencoPartite.filter(m => m.giornata.toString() === giornataScelta.toString());
             }
 
-         // --- 5. CALCOLO STATISTICHE DINAMICHE ---
-const concluse = elencoPartite.filter(m => m.esito && m.esito !== "");
-const totali = concluse.length; // <--- DEFINIAMO TOTALI QUI
-const esatti = concluse.filter(m => m.esito.toUpperCase() === "OK").length;
-const percentuale = totali > 0 ? Math.round((esatti / totali) * 100) : 0;
+            // --- CALCOLO STATISTICHE ---
+            const concluse = elencoPartite.filter(m => m.esito && m.esito !== "");
+            const totali = concluse.length;
+            const esatti = concluse.filter(m => m.esito.toUpperCase() === "OK").length;
+            const percentuale = totali > 0 ? Math.round((esatti / totali) * 100) : 0;
 
-// --- 6. RENDER BOX STATISTICHE (Stile Sisal Premium) ---
-const r = 36; // raggio del cerchio
-const c = 2 * Math.PI * r; // circonferenza
-const offset = c - (percentuale / 100) * c;
+            // --- RENDER BOX STATISTICHE ---
+            const r = 36;
+            const c = 2 * Math.PI * r;
+            const offset = c - (percentuale / 100) * c;
 
-statsContainer.innerHTML = `
-    <div class="relative overflow-hidden bg-[#001e36] rounded-3xl p-6 shadow-2xl border border-white/10 mb-6">
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
-        
-        <div class="relative flex items-center justify-between">
-            <div class="flex-1">
-                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Performance</p>
-                <h3 class="text-white text-xl font-black uppercase italic tracking-tighter">
-                    ${(!giornataScelta || giornataScelta === "tutte" || giornataScelta === "") ? "Totale Stagione" : "Giornata " + giornataScelta}
-                </h3>
-                
-                <div class="flex items-center mt-3 bg-white/5 self-start px-3 py-1.5 rounded-xl border border-white/10">
-                    <span class="text-slate-400 text-[9px] font-bold uppercase tracking-tight">Esatti</span>
-                    <span class="ml-2 text-green-400 font-black text-sm">${esatti}</span>
-                    <span class="mx-2 text-white/20">/</span>
-                    <span class="text-white font-bold text-xs">${totali}</span>
-                </div>
-            </div>
-
-            <div class="relative flex items-center justify-center w-24 h-24">
-                <svg class="w-full h-full transform -rotate-90">
-                    <circle cx="48" cy="48" r="${r}" stroke="#162e44" stroke-width="7" fill="transparent" />
-                    <circle cx="48" cy="48" r="${r}" 
-                        stroke="${percentuale >= 50 ? '#22c55e' : '#eab308'}" 
-                        stroke-width="7" 
-                        fill="transparent" 
-                        stroke-dasharray="${c}" 
-                        stroke-dashoffset="${offset}" 
-                        stroke-linecap="round"
-                        style="transition: stroke-dashoffset 1s ease-out;" />
-                </svg>
-                <div class="absolute flex flex-col items-center justify-center">
-                    <span class="text-xl font-black text-white leading-none">${percentuale}%</span>
-                    <span class="text-[7px] text-blue-300 font-bold uppercase mt-1 tracking-tighter">Win Rate</span>
-                </div>
-            </div>
-        </div>
-    </div>
-`;
-
-            // --- 7. RENDER LISTA ---
-            let htmlPartite = "";
-            [...elencoPartite].reverse().forEach(match => {
-                const esito = match.esito ? match.esito.toUpperCase() : "";
-                const badgeColor = esito === "OK" ? "bg-green-500 text-white" : (esito === "KO" ? "bg-red-500 text-white" : "bg-slate-200 text-slate-500");
-                
-                htmlPartite += `
-                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mb-3 animate-in fade-in zoom-in duration-300">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-[9px] font-bold text-slate-400 uppercase italic">${match.data} - G. ${match.giornata}</span>
-                            <span class="px-2 py-0.5 rounded-full font-black text-[10px] ${badgeColor}">${esito || 'N.D.'}</span>
-                        </div>
-                        <div class="text-sm font-black text-slate-800 uppercase mb-3 tracking-tight">${match.squadre}</div>
-                        <div class="grid grid-cols-2 gap-2 bg-slate-50 rounded-xl p-2 border border-slate-50">
-                            <div class="text-center">
-                                <p class="text-[7px] text-slate-400 uppercase font-bold">Risultato</p>
-                                <p class="text-xs font-black text-slate-700">${match.risultato || '-'}</p>
+            statsContainer.innerHTML = `
+                <div class="relative overflow-hidden bg-[#001e36] rounded-3xl p-6 shadow-2xl border border-white/10 mb-6">
+                    <div class="relative flex items-center justify-between">
+                        <div class="flex-1">
+                            <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Performance</p>
+                            <h3 class="text-white text-xl font-black uppercase italic tracking-tighter">
+                                ${(!giornataScelta || giornataScelta === "tutte" || giornataScelta === "") ? "Totale Stagione" : "Giornata " + giornataScelta}
+                            </h3>
+                            <div class="flex items-center mt-3 bg-white/5 self-start px-3 py-1.5 rounded-xl border border-white/10">
+                                <span class="text-slate-400 text-[9px] font-bold uppercase tracking-tight">Esatti</span>
+                                <span class="ml-2 text-green-400 font-black text-sm">${esatti}</span>
+                                <span class="mx-2 text-white/20">/</span>
+                                <span class="text-white font-bold text-xs">${totali}</span>
                             </div>
-                            <div class="text-center border-l border-slate-200">
-                                <p class="text-[7px] text-slate-400 uppercase font-bold">Pronostico</p>
-                                <p class="text-xs font-black text-blue-600">${match.pronostico}</p>
+                        </div>
+                        <div class="relative flex items-center justify-center w-24 h-24">
+                            <svg class="w-full h-full transform -rotate-90">
+                                <circle cx="48" cy="48" r="${r}" stroke="#162e44" stroke-width="7" fill="transparent" />
+                                <circle cx="48" cy="48" r="${r}" stroke="${percentuale >= 50 ? '#22c55e' : '#eab308'}" stroke-width="7" fill="transparent" stroke-dasharray="${c}" stroke-dashoffset="${offset}" stroke-linecap="round" />
+                            </svg>
+                            <div class="absolute flex flex-col items-center justify-center">
+                                <span class="text-xl font-black text-white leading-none">${percentuale}%</span>
                             </div>
                         </div>
                     </div>
-                `;
-            });
+                </div>
+            `;
+
+      // --- RENDER LISTA CON LOGHI (Versione Blindata e Ordinata) ---
+let htmlPartite = "";
+[...elencoPartite].reverse().forEach(match => {
+    const esito = match.esito ? match.esito.toUpperCase() : "";
+    const badgeColor = esito === "OK" ? "bg-green-500 text-white" : (esito === "KO" ? "bg-red-500 text-white" : "bg-slate-200 text-slate-500");
+    
+    // 1. PULIZIA NOMI SQUADRE
+    // Questa Regex gestisce sia il trattino "-" che il "VS" (case insensitive)
+    const nomiSplit = match.squadre.split(/\s*-\s*|\s+VS\s+/i);
+    const casa = nomiSplit[0] ? nomiSplit[0].trim() : "";
+    const ospite = nomiSplit[1] ? nomiSplit[1].trim() : "";
+
+    htmlPartite += `
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-4 animate-in fade-in zoom-in duration-300">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">${match.data}</span>
+                <span class="px-3 py-1 rounded-lg font-black text-[10px] shadow-sm ${badgeColor}">${esito || 'N.D.'}</span>
+            </div>
+            
+            <div class="flex items-center justify-between mb-5 px-1">
+                <div class="flex flex-col items-center flex-1 min-w-0">
+                    <div class="w-12 h-12 flex items-center justify-center mb-2 bg-slate-50 rounded-full p-2">
+                        <img src="${getLogoSquadra(casa)}" 
+                             class="max-w-full max-h-full object-contain" 
+                             onerror="this.src='https://via.placeholder.com/48?text=?'" 
+                             loading="lazy">
+                    </div>
+                    <span class="text-[10px] font-black text-slate-800 uppercase text-center leading-tight truncate w-full">${casa}</span>
+                </div>
+                
+                <div class="px-4 flex flex-col items-center">
+                    <span class="text-[10px] font-black text-slate-300 italic">VS</span>
+                </div>
+
+                <div class="flex flex-col items-center flex-1 min-w-0">
+                    <div class="w-12 h-12 flex items-center justify-center mb-2 bg-slate-50 rounded-full p-2">
+                        <img src="${getLogoSquadra(ospite)}" 
+                             class="max-w-full max-h-full object-contain" 
+                             onerror="this.src='https://via.placeholder.com/48?text=?'" 
+                             loading="lazy">
+                    </div>
+                    <span class="text-[10px] font-black text-slate-800 uppercase text-center leading-tight truncate w-full">${ospite}</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 bg-slate-50 rounded-2xl p-3 border border-slate-100">
+                <div class="text-center">
+                    <p class="text-[8px] text-slate-400 uppercase font-black mb-1 tracking-widest">Risultato</p>
+                    <p class="text-sm font-black text-slate-800 tracking-tighter">${match.risultato || '-'}</p>
+                </div>
+                <div class="text-center border-l border-slate-200 font-black">
+                    <p class="text-[8px] text-slate-400 uppercase font-black mb-1 tracking-widest">Pronostico</p>
+                    <p class="text-sm font-black text-blue-600 italic">${match.pronostico}</p>
+                </div>
+            </div>
+        </div>
+    `;
+});
+
             listaContainer.innerHTML = htmlPartite || "<p class='text-center py-10 text-slate-400'>Nessun match trovato.</p>";
         }
     } catch (e) {
@@ -2620,6 +2669,33 @@ function closeGaffer() {
         modal.classList.remove('flex');
         document.body.style.overflow = 'auto'; // Ripristina scroll
     }
+}
+function getLogoSquadra(nome) {
+    if (!nome) return "";
+    const cleanName = nome.trim().toUpperCase();
+    const loghi = {
+        "ATALANTA":"https://i.ibb.co/HLfTYZx7/Logo-Atalanta-Bergamo-svg.png", 
+        "BOLOGNA":"https://i.ibb.co/jkM5SPbz/Bologna-F-C-1909-logo-svg.png",
+        "CAGLIARI":"https://i.ibb.co/MDpds1V1/cagliari-calcio-logo-png-seeklogo-315166-3.png", 
+        "COMO":"https://i.ibb.co/qYhwMQzH/Logo-Como-1907-2019.png",
+        "CREMONESE":"https://i.ibb.co/mCKdTQkH/Unione-Sportiva-Cremonese-logo-svg-1.png", 
+        "FIORENTINA":"https://i.ibb.co/4gZ5jDc5/ACF-Fiorentina-logo-Italy-2022-svg.png",
+        "GENOA":"https://i.ibb.co/Z6RcxTWw/Genoa-Cricket-and-Football-Club-logo-svg.png", 
+        "INTER":"https://i.ibb.co/F4C4vHjc/FC-Internazionale-Milano-2021-svg-1.png",
+        "JUVENTUS":"https://i.ibb.co/xtkRyBJp/Juventus-FC-2017-logo.png", 
+        "LAZIO":"https://i.ibb.co/840BWT8m/Stemma-della-Societ-Sportiva-Lazio-svg.png",
+        "LECCE":"https://i.ibb.co/SDQ0zy8s/US-Lecce-Stemma-svg.png", 
+        "MILAN":"https://i.ibb.co/B2V1c6K3/Logo-of-AC-Milan-svg.png",
+        "NAPOLI":"https://i.ibb.co/DgmL7YGb/SSC-Neapel-svg.png", 
+        "PARMA":"https://i.ibb.co/bgMLjHdf/Logo-Parma-Calcio-1913-adozione-2016-svg.png",
+        "PISA":"https://i.ibb.co/35bNsCSV/Logo-Pisa-SC-2017-svg.png", 
+        "ROMA":"https://i.ibb.co/rRkxM7Bf/AS-Roma-Logo-2017-svg-1.png",
+        "SASSUOLO":"https://i.ibb.co/Xrj8PYjx/Ussassuolostemma-svg.png", 
+        "TORINO":"https://i.ibb.co/v62Bw8qY/Torino-FC-logo-svg.png",
+        "UDINESE":"https://i.ibb.co/5xhRTYmp/Logo-Udinese-Calcio-svg.png", 
+        "VERONA":"https://i.ibb.co/k6yWJsZf/Hellas-Verona-FC-logo-2020-svg.png"
+    };
+    return loghi[cleanName] || "https://via.placeholder.com/40?text=?"; 
 }
 
 
