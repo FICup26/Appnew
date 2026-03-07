@@ -2814,9 +2814,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { 
     getFirestore, collection, addDoc, onSnapshot, serverTimestamp, 
-    query, orderBy, doc, updateDoc, arrayUnion, setDoc 
+    query, orderBy, doc, updateDoc, arrayUnion 
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { getMessaging, getToken, isSupported } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-messaging.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAWMmt7lrRF1V6AIpQWh2CwXZE88_w_8E0",
@@ -2831,20 +2830,24 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-let userNick = localStorage.getItem('ficup_chat_nick');
+let userNick = localStorage.getItem('ficup_chat_nick') || "";
 let isChatVisible = false;
-let lastMsgId = null;
+let lastMsgId = null; 
 let citazioneAttiva = null;
-let messaging = null;
 
-// Audio Notifica
+// AUDIO: Solo il file mp3, senza richieste di permessi browser
 const chatPop = new Audio('https://ficup26.github.io/Appnew/notifica.mp3');
-chatPop.volume = 1.0;
+chatPop.preload = 'auto';
 
-// Sblocco audio forzato per mobile
-document.addEventListener('click', () => {
-    chatPop.play().then(() => { chatPop.pause(); chatPop.currentTime = 0; }).catch(()=>{});
-}, { once: true });
+// Sblocco audio obbligatorio (al primo click sulla pagina)
+const unlockAudio = () => {
+    chatPop.play().then(() => {
+        chatPop.pause();
+        chatPop.currentTime = 0;
+        document.removeEventListener('click', unlockAudio);
+    }).catch(() => {});
+};
+document.addEventListener('click', unlockAudio);
 
 const formatTime = (ts) => {
     if (!ts) return "";
@@ -2852,29 +2855,88 @@ const formatTime = (ts) => {
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
-// --- NOTIFICHE PUSH ---
-async function inizializzaNotifiche() {
-    const supported = await isSupported();
-    if (!supported) return;
-    messaging = getMessaging(app);
-    Notification.requestPermission().then(p => {
-        if (p === "granted" && userNick) attivaNotifichePush();
-    });
-}
-async function attivaNotifichePush() {
-    try {
-        const token = await getToken(messaging, { vapidKey: 'BMO6X43sdVtm18tPkI0a4M2KeGxlYnqTy-6uAYPhOseO9m9fFpfXlKi9ifK4YpiRMuoMVnYYII6zJe4NJ0pylOk' });
-        if (token) await setDoc(doc(db, "fcmTokens", userNick), { token, ultimoAccesso: serverTimestamp() });
-    } catch (e) {}
-}
-inizializzaNotifiche();
+// CORE CHAT
+signInAnonymously(auth).then(() => {
+    if (userNick) {
+        document.getElementById('chat-auth')?.classList.add('hidden');
+        document.getElementById('chat-main')?.classList.remove('hidden');
+    }
 
-// --- FUNZIONI WINDOW ---
+    const qChat = query(collection(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'messages'), orderBy('timestamp', 'asc'));
+    
+    onSnapshot(qChat, (snapshot) => {
+        const container = document.getElementById('chat-messages');
+        if(!container) return;
+        
+        let html = "";
+        let newLatestId = "";
+        let lastSender = "";
+
+        snapshot.docs.forEach((docSnap) => {
+            const m = docSnap.data();
+            const id = docSnap.id;
+            newLatestId = id;
+            lastSender = m.senderName;
+            const isMe = m.senderName === userNick;
+            
+            // Segna come letto
+            if (userNick && (!m.readBy || !m.readBy.includes(userNick))) {
+                updateDoc(doc(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'messages', id), {
+                    readBy: arrayUnion(userNick)
+                }).catch(()=>{});
+            }
+
+            // Chi ha letto (escludendo l'autore)
+            const altriLettori = m.readBy ? m.readBy.filter(n => n !== m.senderName) : [];
+            const isRead = altriLettori.length > 0;
+            const testoLettori = isRead ? `Letto da: ${altriLettori.join(", ")}` : "";
+
+            const citazioneHtml = m.rispostaA ? `<div style="font-size:10px; opacity:0.6; border-left:2px solid ${isMe?'white':'gray'}; padding-left:5px; margin-bottom:4px; font-style:italic;">${m.rispostaA}</div>` : "";
+
+            html += `
+                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-3 w-full">
+                    <div class="flex items-center gap-2 px-2 mb-1">
+                        <span class="text-[9px] font-black text-slate-400 uppercase">${m.senderName}</span>
+                        <span class="text-[8px] text-slate-500">${formatTime(m.timestamp)}</span>
+                    </div>
+                    <div onclick="window.preparaRisposta('${(m.text || '').replace(/'/g, "\\'")}', '${m.senderName}')" 
+                         class="shadow-sm cursor-pointer ${isMe ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none' : 'bg-white border text-slate-700 rounded-2xl rounded-tl-none'}" 
+                         style="padding: 8px 12px 14px 12px; max-width: 85%; position: relative; min-width: 80px; word-wrap: break-word;">
+                        ${citazioneHtml}
+                        <div style="font-size: 14px;">${m.text}</div>
+                        <div style="position: absolute; bottom: 3px; right: 8px;">
+                            <span style="color: ${isRead ? '#34b7f1' : '#ccc'}; font-size: 10px;"><i class="fas fa-check-double"></i></span>
+                        </div>
+                    </div>
+                    ${isMe && isRead ? `<span class="text-[8px] text-blue-500 px-2 mt-1 italic font-bold">${testoLettori}</span>` : ""}
+                </div>`;
+        });
+
+        // SUONO: Scatta se arriva un nuovo messaggio e non l'ho mandato io
+        if (lastMsgId && newLatestId !== lastMsgId && lastSender !== userNick) {
+            // Suona sempre se non sono io il mittente
+            chatPop.currentTime = 0;
+            chatPop.play().catch(() => {});
+            
+            // Se la chat è chiusa, mostra il pallino rosso
+            if (!isChatVisible) {
+                document.getElementById('chat-notif-badge')?.classList.remove('hidden');
+            }
+        }
+        
+        lastMsgId = newLatestId;
+        container.innerHTML = html;
+        if(isChatVisible) container.scrollTop = container.scrollHeight;
+    });
+});
+
+// FUNZIONI WINDOW
 window.openChat = () => {
     document.getElementById('chat-overlay').style.display = 'flex';
     document.getElementById('chat-notif-badge')?.classList.add('hidden');
     isChatVisible = true;
-    setTimeout(scrollDown, 100);
+    const c = document.getElementById('chat-messages');
+    if(c) c.scrollTop = c.scrollHeight;
 };
 window.closeChat = () => {
     document.getElementById('chat-overlay').style.display = 'none';
@@ -2885,11 +2947,8 @@ window.saveChatNick = () => {
     if (val.length < 2) return alert("Nick troppo corto!");
     userNick = val;
     localStorage.setItem('ficup_chat_nick', val);
-    document.getElementById('chat-auth').classList.add('hidden');
-    document.getElementById('chat-main').classList.remove('hidden');
-    attivaNotifichePush();
+    location.reload(); 
 };
-
 window.preparaRisposta = (testo, autore) => {
     citazioneAttiva = `Risposta a ${autore}: ${testo}`;
     const input = document.getElementById('chat-input');
@@ -2897,79 +2956,6 @@ window.preparaRisposta = (testo, autore) => {
     input.focus();
 };
 
-function scrollDown() {
-    const c = document.getElementById('chat-messages');
-    if(c) c.scrollTop = c.scrollHeight;
-}
-
-// --- CORE FIREBASE ---
-signInAnonymously(auth).then(() => {
-    if (userNick) {
-        document.getElementById('chat-auth').classList.add('hidden');
-        document.getElementById('chat-main').classList.remove('hidden');
-    }
-
-    const qChat = query(collection(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'messages'), orderBy('timestamp', 'asc'));
-    
-    onSnapshot(qChat, (snapshot) => {
-        const container = document.getElementById('chat-messages');
-        if(!container) return;
-        
-        let html = "";
-        let latestId = "";
-        let lastSender = "";
-
-        snapshot.docs.forEach((docSnap) => {
-            const m = docSnap.data();
-            latestId = docSnap.id;
-            lastSender = m.senderName;
-            const isMe = m.senderName === userNick;
-            
-            // Segna come letto se non lo è già
-            if (userNick && (!m.readBy || !m.readBy.includes(userNick))) {
-                updateDoc(doc(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'messages', docSnap.id), {
-                    readBy: arrayUnion(userNick)
-                });
-            }
-
-            const lettori = m.readBy ? m.readBy.filter(n => n !== userNick).join(", ") : "";
-            const isRead = m.readBy && m.readBy.length > 1;
-            const citazioneHtml = m.rispostaA ? `<div style="font-size:10px; opacity:0.6; border-left:2px solid ${isMe?'white':'gray'}; padding-left:5px; margin-bottom:4px; font-style:italic;">${m.rispostaA}</div>` : "";
-
-            html += `
-                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-3">
-                    <div class="flex items-center gap-2 px-2 mb-1">
-                        <span class="text-[9px] font-black text-slate-400 uppercase">${m.senderName}</span>
-                        <span class="text-[8px] text-slate-500">${formatTime(m.timestamp)}</span>
-                    </div>
-                    <div onclick="window.preparaRisposta('${(m.text || '').replace(/'/g, "\\'")}', '${m.senderName}')" 
-                         class="shadow-sm cursor-pointer ${isMe ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none' : 'bg-white border text-slate-700 rounded-2xl rounded-tl-none'}" 
-                         style="padding: 8px 12px 14px 12px; max-width: 85%; position: relative; min-width: 80px; word-wrap: break-word;">
-                        ${citazioneHtml}
-                        <div style="font-size: 14px;">${m.text}</div>
-                        <div style="position: absolute; bottom: 3px; right: 8px; display: ${isMe ? 'block' : 'none'};">
-                            <span style="color: ${isRead ? '#34b7f1' : '#ccc'}; font-size: 10px;"><i class="fas fa-check-double"></i></span>
-                        </div>
-                    </div>
-                    ${isMe && isRead ? `<span class="text-[8px] text-slate-400 px-2 mt-1 italic">Letto da: ${lettori}</span>` : ""}
-                </div>`;
-        });
-
-        // --- LOGICA SUONO E NOTIFICA ---
-        if (lastMsgId && latestId !== lastMsgId && !isChatVisible && lastSender !== userNick) {
-            document.getElementById('chat-notif-badge')?.classList.remove('hidden');
-            chatPop.play().catch(()=>{});
-            if (Notification.permission === "granted") {
-                new Notification("FIcup: " + lastSender, { body: "Nuovo messaggio" });
-            }
-        }
-        lastMsgId = latestId;
-        container.innerHTML = html;
-        scrollDown();
-    });
-});
-
-// INVIO
 document.addEventListener('submit', async (e) => {
     if (e.target.id === 'chat-form') {
         e.preventDefault();
