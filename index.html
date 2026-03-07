@@ -2810,7 +2810,6 @@ function getLogoSquadra(nome) {
 </div>
 
 <script type="module">
-// 1. IMPORT
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { 
@@ -2819,7 +2818,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getMessaging, getToken, isSupported } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-messaging.js";
 
-// 2. CONFIGURAZIONE
 const firebaseConfig = {
     apiKey: "AIzaSyAWMmt7lrRF1V6AIpQWh2CwXZE88_w_8E0",
     authDomain: "ficup-c9186.firebaseapp.com",
@@ -2839,34 +2837,35 @@ let lastMsgId = null;
 let citazioneAttiva = null;
 let messaging = null;
 
+// Audio Notifica
 const chatPop = new Audio('https://ficup26.github.io/Appnew/notifica.mp3');
 chatPop.volume = 1.0;
 
-// --- FUNZIONE DATA E ORA ---
+// Sblocco audio forzato per mobile
+document.addEventListener('click', () => {
+    chatPop.play().then(() => { chatPop.pause(); chatPop.currentTime = 0; }).catch(()=>{});
+}, { once: true });
+
 const formatTime = (ts) => {
     if (!ts) return "";
     const d = ts.toDate();
-    const oggi = new Date();
-    const isOggi = d.getDate() === oggi.getDate() && d.getMonth() === oggi.getMonth();
-    const ora = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    if (isOggi) return ora;
-    return d.toLocaleDateString([], { day: '2-digit', month: '2-digit' }) + " " + ora;
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
-// --- LOGICA NOTIFICHE ---
+// --- NOTIFICHE PUSH ---
 async function inizializzaNotifiche() {
     const supported = await isSupported();
-    if (!supported) return console.warn("Notifiche non supportate");
+    if (!supported) return;
     messaging = getMessaging(app);
-    Notification.requestPermission().then(p => { if (p === "granted" && userNick) attivaNotifichePush(); });
+    Notification.requestPermission().then(p => {
+        if (p === "granted" && userNick) attivaNotifichePush();
+    });
 }
-
 async function attivaNotifichePush() {
-    if (!messaging || !userNick) return;
     try {
         const token = await getToken(messaging, { vapidKey: 'BMO6X43sdVtm18tPkI0a4M2KeGxlYnqTy-6uAYPhOseO9m9fFpfXlKi9ifK4YpiRMuoMVnYYII6zJe4NJ0pylOk' });
-        if (token) await setDoc(doc(db, "fcmTokens", userNick), { token, ultimoAccesso: serverTimestamp(), dispositivo: navigator.userAgent });
-    } catch (err) { console.error(err); }
+        if (token) await setDoc(doc(db, "fcmTokens", userNick), { token, ultimoAccesso: serverTimestamp() });
+    } catch (e) {}
 }
 inizializzaNotifiche();
 
@@ -2875,49 +2874,22 @@ window.openChat = () => {
     document.getElementById('chat-overlay').style.display = 'flex';
     document.getElementById('chat-notif-badge')?.classList.add('hidden');
     isChatVisible = true;
-    checkNick();
     setTimeout(scrollDown, 100);
 };
-
 window.closeChat = () => {
     document.getElementById('chat-overlay').style.display = 'none';
     isChatVisible = false;
 };
-
 window.saveChatNick = () => {
     const val = document.getElementById('chat-nick-input').value.trim();
     if (val.length < 2) return alert("Nick troppo corto!");
     userNick = val;
     localStorage.setItem('ficup_chat_nick', val);
-    checkNick();
+    document.getElementById('chat-auth').classList.add('hidden');
+    document.getElementById('chat-main').classList.remove('hidden');
     attivaNotifichePush();
 };
 
-function checkNick() {
-    if (userNick) {
-        document.getElementById('chat-auth')?.classList.add('hidden');
-        document.getElementById('chat-main')?.classList.remove('hidden');
-    }
-}
-
-function scrollDown() {
-    const c = document.getElementById('chat-messages');
-    if(c) c.scrollTop = c.scrollHeight;
-}
-
-function formattaTesto(t) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return t.replace(urlRegex, (url) => `<a href="${url}" target="_blank" style="color:#facc15; font-weight:bold;">${url}</a>`);
-}
-
-const getAvatarColor = (n) => {
-    const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
-    let hash = 0;
-    for (let i = 0; i < n.length; i++) hash = n.charCodeAt(i) + ((hash << 5) - hash);
-    return colors[Math.abs(hash) % colors.length];
-};
-
-// --- FUNZIONE RISPOSTA (MENZIONE) ---
 window.preparaRisposta = (testo, autore) => {
     citazioneAttiva = `Risposta a ${autore}: ${testo}`;
     const input = document.getElementById('chat-input');
@@ -2925,23 +2897,24 @@ window.preparaRisposta = (testo, autore) => {
     input.focus();
 };
 
-window.likeVideo = async (id) => {
-    const vDoc = doc(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'social_clips', id);
-    await updateDoc(vDoc, { likes: serverTimestamp() }); // Nota: usa increment(1) se hai la funzione importata
-};
+function scrollDown() {
+    const c = document.getElementById('chat-messages');
+    if(c) c.scrollTop = c.scrollHeight;
+}
 
-document.addEventListener('click', () => {
-    chatPop.play().then(() => { chatPop.pause(); chatPop.currentTime = 0; }).catch(() => {});
-}, { once: true });
-
-// --- LISTENER CHAT ---
+// --- CORE FIREBASE ---
 signInAnonymously(auth).then(() => {
-    checkNick();
+    if (userNick) {
+        document.getElementById('chat-auth').classList.add('hidden');
+        document.getElementById('chat-main').classList.remove('hidden');
+    }
+
     const qChat = query(collection(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'messages'), orderBy('timestamp', 'asc'));
     
     onSnapshot(qChat, (snapshot) => {
         const container = document.getElementById('chat-messages');
         if(!container) return;
+        
         let html = "";
         let latestId = "";
         let lastSender = "";
@@ -2951,12 +2924,15 @@ signInAnonymously(auth).then(() => {
             latestId = docSnap.id;
             lastSender = m.senderName;
             const isMe = m.senderName === userNick;
-            const orario = formatTime(m.timestamp);
-
+            
+            // Segna come letto se non lo è già
             if (userNick && (!m.readBy || !m.readBy.includes(userNick))) {
-                updateDoc(doc(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'messages', docSnap.id), { readBy: arrayUnion(userNick) }).catch(()=>{});
+                updateDoc(doc(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'messages', docSnap.id), {
+                    readBy: arrayUnion(userNick)
+                });
             }
 
+            const lettori = m.readBy ? m.readBy.filter(n => n !== userNick).join(", ") : "";
             const isRead = m.readBy && m.readBy.length > 1;
             const citazioneHtml = m.rispostaA ? `<div style="font-size:10px; opacity:0.6; border-left:2px solid ${isMe?'white':'gray'}; padding-left:5px; margin-bottom:4px; font-style:italic;">${m.rispostaA}</div>` : "";
 
@@ -2964,49 +2940,38 @@ signInAnonymously(auth).then(() => {
                 <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-3">
                     <div class="flex items-center gap-2 px-2 mb-1">
                         <span class="text-[9px] font-black text-slate-400 uppercase">${m.senderName}</span>
-                        <span class="text-[8px] text-slate-500">${orario}</span>
+                        <span class="text-[8px] text-slate-500">${formatTime(m.timestamp)}</span>
                     </div>
                     <div onclick="window.preparaRisposta('${(m.text || '').replace(/'/g, "\\'")}', '${m.senderName}')" 
                          class="shadow-sm cursor-pointer ${isMe ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none' : 'bg-white border text-slate-700 rounded-2xl rounded-tl-none'}" 
                          style="padding: 8px 12px 14px 12px; max-width: 85%; position: relative; min-width: 80px; word-wrap: break-word;">
                         ${citazioneHtml}
-                        <div style="font-size: 14px; line-height: 1.4;">${formattaTesto(m.text)}</div>
+                        <div style="font-size: 14px;">${m.text}</div>
                         <div style="position: absolute; bottom: 3px; right: 8px; display: ${isMe ? 'block' : 'none'};">
-                            <span style="color: ${isRead ? '#34b7f1' : '#001a33'}; font-size: 10px;">
-                                <i class="fas fa-check-double"></i>
-                            </span>
+                            <span style="color: ${isRead ? '#34b7f1' : '#ccc'}; font-size: 10px;"><i class="fas fa-check-double"></i></span>
                         </div>
                     </div>
+                    ${isMe && isRead ? `<span class="text-[8px] text-slate-400 px-2 mt-1 italic">Letto da: ${lettori}</span>` : ""}
                 </div>`;
         });
 
+        // --- LOGICA SUONO E NOTIFICA ---
         if (lastMsgId && latestId !== lastMsgId && !isChatVisible && lastSender !== userNick) {
             document.getElementById('chat-notif-badge')?.classList.remove('hidden');
-            chatPop.play().catch(() => {});
-            if (Notification.permission === "granted") new Notification("FIcup: " + lastSender, { body: "Nuovo messaggio" });
+            chatPop.play().catch(()=>{});
+            if (Notification.permission === "granted") {
+                new Notification("FIcup: " + lastSender, { body: "Nuovo messaggio" });
+            }
         }
         lastMsgId = latestId;
         container.innerHTML = html;
         scrollDown();
     });
-
-    // LISTENER SOCIAL
-    const qSocial = query(collection(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'social_clips'), orderBy('timestamp', 'desc'));
-    onSnapshot(qSocial, (snapshot) => {
-        const sc = document.getElementById('social-feed');
-        if(!sc) return;
-        let shtml = "";
-        snapshot.forEach(ds => {
-            const c = ds.data();
-            shtml += `<div class="mb-4"><video src="${c.videoUrl}" loop playsinline class="w-full rounded-2xl" onclick="this.paused?this.play():this.pause()"></video></div>`;
-        });
-        sc.innerHTML = shtml;
-    });
 });
 
 // INVIO
 document.addEventListener('submit', async (e) => {
-    if (e.target && e.target.id === 'chat-form') {
+    if (e.target.id === 'chat-form') {
         e.preventDefault();
         const input = document.getElementById('chat-input');
         const text = input.value.trim();
