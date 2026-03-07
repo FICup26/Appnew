@@ -2812,7 +2812,19 @@ function getLogoSquadra(nome) {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    onSnapshot, 
+    serverTimestamp, 
+    query, 
+    orderBy,
+    doc,         // <--- AGGIUNGI QUESTO
+    updateDoc,   // <--- AGGIUNGI QUESTO
+    arrayUnion   // <--- AGGIUNGI QUESTO
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyAWMmt7lrRF1V6AIpQWh2CwXZE88_w_8E0",
@@ -2841,11 +2853,14 @@ const formatTime = (timestamp) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
-// --- FUNZIONI GLOBALI (WINDOW) ---
+// ==========================================
+// BLOCCO UNICO - COPIA DA QUI FINO ALLA FINE
+// ==========================================
 
+// --- FUNZIONI GLOBALI (WINDOW) ---
 window.openChat = () => {
     document.getElementById('chat-overlay').style.display = 'flex';
-    document.getElementById('chat-notif-badge').classList.add('hidden'); // Reset notifica
+    document.getElementById('chat-notif-badge').classList.add('hidden');
     isChatVisible = true;
     checkNick();
     setTimeout(scrollDown, 100);
@@ -2861,7 +2876,7 @@ window.saveChatNick = () => {
     const val = input.value.trim();
     if (val.length < 2) return alert("Inserisci un nickname valido!");
     userNick = val;
-    localStorage.setItem('ficup_chat_nick', val); // Salva in cache
+    localStorage.setItem('ficup_chat_nick', val);
     checkNick();
 };
 
@@ -2877,59 +2892,123 @@ function scrollDown() {
     if(container) container.scrollTop = container.scrollHeight;
 }
 
-// --- LOGICA FIREBASE ---
+// --- FUNZIONI EXTRA (LINK, AVATAR, LIKE) ---
+function formattaTesto(testo) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return testo.replace(urlRegex, (url) => `<a href="${url}" target="_blank" style="color:#facc15; text-decoration:underline; font-weight:bold;">${url}</a>`);
+}
 
-// Definiamo il suono fuori per caricarlo una sola volta
+const getAvatarColor = (name) => {
+    const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    return colors[Math.abs(hash) % colors.length];
+};
+
+let citazioneAttiva = null;
+window.preparaRisposta = (testo, autore) => {
+    citazioneAttiva = `Risposta a ${autore}: ${testo}`;
+    const input = document.getElementById('chat-input');
+    input.placeholder = `Rispondi a ${autore}...`;
+    input.focus();
+};
+
+window.likeVideo = async (id) => {
+    const vDoc = doc(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'social_clips', id);
+    await updateDoc(vDoc, { likes: increment(1) });
+};
+
+// --- LOGICA FIREBASE ---
 const chatPop = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
 
 signInAnonymously(auth).then(() => {
-    const q = query(collection(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'messages'), orderBy('timestamp', 'asc'));
     
-    onSnapshot(q, (snapshot) => {
-        const container = document.getElementById('chat-messages');
-        let html = "";
-        let latestId = "";
-        let lastSender = ""; // Per identificare chi ha inviato l'ultimo messaggio
+    // 1. LISTENER CHAT
+    const qChat = query(collection(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'messages'), orderBy('timestamp', 'asc'));
+    onSnapshot(qChat, (snapshot) => {
+    const container = document.getElementById('chat-messages');
+    if(!container) return;
+    let html = "";
+    let latestId = "";
+    let lastSender = "";
 
-        snapshot.forEach(doc => {
-            const m = doc.data();
-            latestId = doc.id;
-            lastSender = m.senderName; // Memorizza il nome dell'ultimo mittente
-            
-            const isMe = m.senderName === userNick;
-            const timeStr = formatTime(m.timestamp);
-            
-            html += `
-                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-1">
-                    <div class="flex items-center gap-2 px-2">
-                        <span class="text-[9px] font-black text-slate-400 uppercase">${m.senderName}</span>
-                        <span class="text-[8px] text-slate-300 font-medium">${timeStr}</span>
+    snapshot.forEach(docSnap => {
+        const m = docSnap.data();
+        latestId = docSnap.id;
+        lastSender = m.senderName;
+        const isMe = m.senderName === userNick;
+
+            // --- LOGICA "LETTO" ---
+        const isRead = m.readBy && m.readBy.length > 1; 
+        
+        // Prepariamo la lista dei nomi (escludendo il tuo)
+        const lettori = m.readBy ? m.readBy.filter(n => n !== userNick).join(", ") : "";
+
+        const citazioneHtml = m.rispostaA ? `<div style="font-size:10px; opacity:0.6; border-left:2px solid ${isMe ? 'white' : 'gray'}; padding-left:5px; margin-bottom:4px; font-style:italic;">${m.rispostaA}</div>` : "";
+
+        html += `
+            <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-3">
+                <span class="text-[9px] font-black text-slate-400 px-2 uppercase mb-1">${m.senderName}</span>
+                
+                <div onclick="window.preparaRisposta('${(m.text || '').replace(/'/g, "\\'")}', '${m.senderName}')" 
+                     class="shadow-sm cursor-pointer ${isMe ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none' : 'bg-white border text-slate-700 rounded-2xl rounded-tl-none'}" 
+                     style="padding: 8px 12px 16px 12px; max-width: 85%; position: relative; min-width: 70px; word-wrap: break-word;">
+                    
+                    ${citazioneHtml}
+                    <div style="font-size: 14px; line-height: 1.4;">${formattaTesto(m.text)}</div>
+
+                    <div style="position: absolute; bottom: 3px; right: 8px; display: ${isMe ? 'block' : 'none'};">
+                        <span style="color: ${isRead ? '#34b7f1' : '#001a33'}; font-size: 12px; font-weight: bold;">
+                            <i class="fas fa-check-double"></i>
+                        </span>
                     </div>
-                    <div class="shadow-sm ${isMe ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none' : 'bg-white border text-slate-700 rounded-2xl rounded-tl-none'}" 
-                         style="padding:8px 14px; font-size:14px; max-width:85%; word-wrap: break-word;">
-                        ${m.text}
-                    </div>
-                </div>`;
+                </div>
+                
+                ${isMe && isRead ? `<span class="text-[8px] text-slate-400 px-2 mt-1 italic">Letto da: ${lettori}</span>` : ""}
+            </div>`;
+
         });
 
-        // Gestione Notifica Sonora e Visiva
-        if (lastMsgId && latestId !== lastMsgId) {
-            // Suona solo se la chat è chiusa E il messaggio non è il mio
-            if (!isChatVisible && lastSender !== userNick) {
-                document.getElementById('chat-notif-badge').classList.remove('hidden');
-                chatPop.play().catch(() => {
-                    console.log("Audio bloccato: serve interazione utente");
-                });
-            }
+        if (lastMsgId && latestId !== lastMsgId && !isChatVisible && lastSender !== userNick) {
+            document.getElementById('chat-notif-badge').classList.remove('hidden');
+            chatPop.play().catch(() => {});
         }
-        
         lastMsgId = latestId;
         container.innerHTML = html;
         scrollDown();
     });
+
+    // 2. LISTENER SOCIAL
+    const qSocial = query(collection(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'social_clips'), orderBy('timestamp', 'desc'));
+    onSnapshot(qSocial, (snapshot) => {
+        const container = document.getElementById('social-feed');
+        if (!container) return;
+        let html = "";
+        snapshot.forEach(docSnap => {
+            const clip = docSnap.data();
+            const id = docSnap.id;
+            const color = getAvatarColor(clip.senderName);
+            const iniziali = clip.senderName.charAt(0).toUpperCase();
+
+            html += `
+                <div class="video-card bg-slate-900 relative rounded-3xl overflow-hidden shadow-xl mb-6">
+                    <video src="${clip.videoUrl}" loop playsinline class="w-full h-80 object-cover" onclick="this.paused?this.play():this.pause()"></video>
+                    <div class="absolute bottom-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent">
+                        <div class="flex items-center gap-2 mb-2 text-white">
+                            <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold" style="background-color:${color}">${iniziali}</div>
+                            <span class="text-[10px] font-bold uppercase">@${clip.senderName}</span>
+                        </div>
+                        <button onclick="likeVideo('${id}')" class="bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-full text-[10px] font-bold">
+                            ❤️ ${clip.likes || 0}
+                        </button>
+                    </div>
+                </div>`;
+        });
+        container.innerHTML = html;
+    });
 });
 
-// Invio Messaggio
+// --- INVIO MESSAGGIO ---
 document.addEventListener('submit', async (e) => {
     if (e.target && e.target.id === 'chat-form') {
         e.preventDefault();
@@ -2937,14 +3016,20 @@ document.addEventListener('submit', async (e) => {
         const text = input.value.trim();
         if (!text || !userNick) return;
 
-        input.value = "";
         await addDoc(collection(db, 'artifacts', 'ficup-lite-v2', 'public', 'data', 'messages'), {
-            text,
+            text: text,
             senderName: userNick,
-            timestamp: serverTimestamp()
+            timestamp: serverTimestamp(),
+            rispostaA: citazioneAttiva,
+            readBy: [userNick] // <--- AGGIUNGI QUESTA RIGA
         });
+
+        input.value = "";
+        citazioneAttiva = null;
+        input.placeholder = "Scrivi un messaggio...";
     }
 });
+
 </script>
 
 
