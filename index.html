@@ -1227,87 +1227,106 @@ body.modal-open { overflow: hidden; }
 </footer>
 
 <style>
-    /* Reset per evitare sforamenti sui bordi mobile */
-    #FaseFinale, #FaseFinale * { 
-        box-sizing: border-box; 
-        max-width: 100%;
-    }
-    
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    
-    /* Card Squadra: Sfondo bianco, testo Blu originale dal foglio */
-    .squadra-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: #ffffff;
-        padding: 12px 16px;
-        border-radius: 12px;
-        margin-bottom: 6px;
-        border: 1px solid #e2e8f0;
-        width: 100%;
-    }
+/* Layout Ricerca */
+.search-wrapper {
+    display: flex;
+    background: #fff;
+    border-radius: 15px;
+    padding: 5px;
+    border: 2px solid #e2e8f0;
+    margin: 10px;
+    align-items: center;
+}
+.search-wrapper input {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    font-weight: 800;
+    outline: none;
+    min-width: 0;
+    color: #1e3a8a;
+}
+.btn-search {
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+}
 
-    .nome-squadra {
-        color: #1e3a8a; /* Blu scuro istituzionale */
-        font-weight: 700;
-        font-size: 13px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+/* Messaggi Blu nella Card Risultato */
+.msg-blue-box {
+    background: rgba(255, 255, 255, 0.95);
+    color: #1e3a8a; 
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 10px;
+    border-left: 5px solid #fbbf24;
+    text-align: left;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
 
-    .tab-attivo {
-        background-color: #2563eb !important;
-        color: #ffffff !important;
-        border-color: #2563eb !important;
-    }
+/* Tab Scorrevoli e Uniformi */
+.tabs-scroll-wrapper {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 15px 10px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+.tabs-scroll-wrapper::-webkit-scrollbar { display: none; }
+
+.tab-btn { 
+    flex: 0 0 130px; 
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px; 
+    font-size: 11px; 
+    font-weight: 800; 
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #1e3a8a;
+    white-space: nowrap;
+}
+.tab-active { 
+    background: #1e3a8a !important; 
+    color: white !important; 
+}
+
 </style>
 
-<div class="bg-white border-b-2 border-blue-600 p-4 mb-4 text-center">
-    <h2 class="text-xl font-black italic text-blue-900 tracking-tighter">FASE FINALE 2025</h2>
-</div>
-
-<div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar px-4">
-    <button onclick="cambiaTab('Campione Nazionale', this)" class="tab-btn tab-attivo bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-[10px] uppercase whitespace-nowrap border border-blue-600">🇮🇹 Nazionale</button>
-    <button onclick="cambiaTab('All Star', this)" class="tab-btn bg-white text-blue-800 font-bold px-4 py-2 rounded-lg text-[10px] uppercase whitespace-nowrap border border-slate-200">⭐ All Star</button>
-    <button onclick="cambiaTab('Europa Cup', this)" class="tab-btn bg-white text-blue-800 font-bold px-4 py-2 rounded-lg text-[10px] uppercase whitespace-nowrap border border-slate-200">🏆 Europa Cup</button>
-    <button onclick="cambiaTab('Conference Cup', this)" class="tab-btn bg-white text-blue-800 font-bold px-4 py-2 rounded-lg text-[10px] uppercase whitespace-nowrap border border-slate-200">⚽ Conference</button>
-    <button onclick="cambiaTab('Coppa di Lega', this)" class="tab-btn bg-white text-blue-800 font-bold px-4 py-2 rounded-lg text-[10px] uppercase whitespace-nowrap border border-slate-200">🏮 Coppa Lega</button>
-</div>
-
-<div class="px-4 mb-4">
-    <div class="bg-white p-4 rounded-xl shadow-md border border-slate-200">
-        <label class="block text-[10px] font-black text-blue-900 uppercase mb-2">Cerca il tuo team:</label>
-        <div class="flex gap-2">
-            <input type="text" id="inputSquadra" placeholder="Cerca nome..." 
-                class="min-w-0 flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-blue-900 font-bold outline-none focus:border-blue-500">
-            <button onclick="cercaSquadra()" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
-        <div id="risultatoCheck" class="hidden mt-3 p-3 rounded-lg text-center font-bold text-xs border-2"></div>
+<div class="search-container">
+    <div class="search-wrapper">
+        <input type="text" id="inputSquadra" placeholder="Cerca la tua squadra...">
+        <button onclick="ricercaGlobale()" class="btn-search">
+            <i class="fas fa-search"></i>
+        </button>
     </div>
 </div>
 
-<div class="bg-slate-50 rounded-t-[24px] p-4 border-t border-slate-200 min-h-[300px]">
-    <div class="flex justify-between items-center mb-3">
-        <h4 id="titoloLista" class="text-blue-900 font-black uppercase text-[10px] italic">Iscritti Nazionale</h4>
-    </div>
-    
-    <div id="listaSquadreDinamica">
-        </div>
+<div id="epicResult" class="epic-card" style="display:none; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 25px; border-radius: 20px; text-align: center; margin: 15px;">
+    <div class="text-4xl mb-2">🏆</div>
+    <h2 id="epicTeam" class="text-2xl font-black uppercase text-white mb-1"></h2>
+    <div id="containerRisultati"></div>
 </div>
 
-<div class="p-4 bg-slate-50">
-    <button onclick="showSection('Home')" class="w-full bg-blue-900 text-white py-4 rounded-xl font-black uppercase text-sm shadow-lg">
-        TORNA ALLA HOMEPAGE
-    </button>
+<div class="tabs-scroll-wrapper">
+    <button onclick="cambiaTab('Campione Nazionale', this)" class="tab-btn tab-active">🇮🇹 NAZIONALE</button>
+    <button onclick="cambiaTab('All Star', this)" class="tab-btn">⭐ ALL STAR</button>
+    <button onclick="cambiaTab('Europa Cup', this)" class="tab-btn">🏆 EUROPA</button>
+    <button onclick="cambiaTab('Conference Cup', this)" class="tab-btn">⚽ CONFERENCE</button>
+    <button onclick="cambiaTab('Coppa di Lega', this)" class="tab-btn">🏮 LEGA</button>
 </div>
 
+<div id="listaSquadreDinamica" class="px-5 pb-20"></div>
 
-
-    </div>
 </div>
 
 </div>
@@ -2972,82 +2991,92 @@ if (userNick) {
 }
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 <script>
-let databaseAttuale = [];
-let foglioCorrente = 'Campione Nazionale';
 const sheetId = '1jLMCn6EgETj-5aYkxUmgYp0BiQNYfj4dwUE5W1uK8Uc';
-
-function cambiaTab(nomeFoglio, btn) {
-    foglioCorrente = nomeFoglio;
-    document.getElementById('titoloLista').innerText = `Iscritti ${nomeFoglio}`;
-    
-    document.querySelectorAll('.tab-btn').forEach(b => {
-        b.classList.remove('tab-attivo', 'bg-blue-600', 'text-white');
-        b.classList.add('bg-white', 'text-blue-800');
-    });
-    btn.classList.add('tab-attivo');
-
-    caricaDatiGoogle();
-}
-
-function caricaDatiGoogle() {
-    const contenitore = document.getElementById('listaSquadreDinamica');
-    contenitore.innerHTML = "<p class='text-center text-slate-400 py-10'>Caricamento...</p>";
-    
-    const script = document.createElement('script');
-    script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:processData&sheet=${encodeURIComponent(foglioCorrente)}`;
-    document.body.appendChild(script);
-    setTimeout(() => { if(script.parentNode) document.body.removeChild(script); }, 2000);
-}
-
-window.processData = function(json) {
-    const rows = json.table.rows;
-    const contenitore = document.getElementById('listaSquadreDinamica');
-    contenitore.innerHTML = "";
-    databaseAttuale = [];
-
-    rows.forEach((row) => {
-        if (row.c && row.c[0] && row.c[0].v) {
-            const nomeOriginale = row.c[0].v.toString();
-            
-            // Salta intestazioni generiche
-            if (nomeOriginale.toLowerCase() === "team" || nomeOriginale.toLowerCase() === "squadra") return;
-
-            databaseAttuale.push(nomeOriginale);
-
-            const item = document.createElement('div');
-            item.className = "squadra-item";
-            item.innerHTML = `
-                <span class="nome-squadra">${nomeOriginale}</span>
-                <i class="fas fa-check-circle text-blue-500 text-xs"></i>
-            `;
-            contenitore.appendChild(item);
-        }
-    });
+const configCoppe = {
+    'Campione Nazionale': "Complimenti sei tra i migliori! Supera gli ostacoli e diventa il CAMPIONE ASSOLUTO! 🏆",
+    'All Star': "Sei una stella tra le stelle. Illumina il campo e dimostra il tuo talento galattico! ⭐",
+    'Europa Cup': "L'Europa ti guarda. Conquista il continente, la gloria ti aspetta! 🌍",
+    'Conference Cup': "Ogni partita è una battaglia. Dimostra il tuo valore e alza la coppa al cielo! ⚽",
+    'Coppa di Lega': "Non demordere! Scala la classifica e prenditi la rivincita alla giornata 38! 🔥"
 };
 
-function cercaSquadra() {
+let databaseSquadre = {};
+
+function inizializzaApp() {
+    Object.keys(configCoppe).forEach(nome => {
+        const script = document.createElement('script');
+        const callbackName = `cb_${nome.replace(/\s/g, '')}`;
+        script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:${callbackName}&sheet=${encodeURIComponent(nome)}`;
+        document.body.appendChild(script);
+
+        window[callbackName] = function(data) {
+            databaseSquadre[nome] = data.table.rows
+                .map(r => r.c[0] ? r.c[0].v.toString() : null)
+                .filter(n => n && n.toLowerCase() !== 'team');
+            if (nome === 'Campione Nazionale') aggiornaLista('Campione Nazionale');
+        };
+    });
+}
+
+function aggiornaLista(nome) {
+    const container = document.getElementById('listaSquadreDinamica');
+    const lista = databaseSquadre[nome] || [];
+    container.innerHTML = lista.map(s => `
+        <div class="squadra-item" style="background:white; margin:6px 0; padding:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <span style="color:#1e3a8a; font-weight:800; text-transform:uppercase; font-size:13px;">${s}</span>
+            <i class="fas fa-check-circle text-blue-500" style="font-size:10px;"></i>
+        </div>
+    `).join('');
+}
+
+function cambiaTab(nome, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+    btn.classList.add('tab-active');
+    aggiornaLista(nome);
+    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+}
+
+function ricercaGlobale() {
     const query = document.getElementById('inputSquadra').value.trim().toLowerCase();
-    const resultDiv = document.getElementById('risultatoCheck');
+    const epicCard = document.getElementById('epicResult');
+    const container = document.getElementById('containerRisultati');
     
     if (query.length < 2) return;
+    
+    container.innerHTML = ""; 
+    let trovata = false;
+    let nomeSquadraTrovata = "";
 
-    // Cerca nel database ignorando maiuscole/minuscole nella ricerca, 
-    // ma recuperando il nome originale trovato
-    const trovata = databaseAttuale.find(s => s.toLowerCase().includes(query));
+    for (let coppa in databaseSquadre) {
+        const match = databaseSquadre[coppa].find(s => s.toLowerCase().includes(query));
+        if (match) {
+            nomeSquadraTrovata = match;
+            container.innerHTML += `
+                <div class="msg-blue-box">
+                    <small style="color:#2563eb; font-weight:900; display:block; margin-bottom:4px;">${coppa.toUpperCase()}</small>
+                    ${configCoppe[coppa]}
+                </div>`;
+            trovata = true;
+        }
+    }
 
-    resultDiv.classList.remove('hidden');
     if (trovata) {
-        resultDiv.className = "mt-3 p-3 rounded-lg text-center font-bold bg-blue-50 text-blue-600 border-blue-200 text-[11px]";
-        resultDiv.innerHTML = `✅ ${trovata} <br> TROVATA IN ${foglioCorrente.toUpperCase()}`;
+        document.getElementById('epicTeam').innerText = nomeSquadraTrovata;
+        epicCard.style.display = 'block';
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#fbbf24', '#ffffff', '#3b82f6'] });
+        epicCard.scrollIntoView({ behavior: 'smooth' });
     } else {
-        resultDiv.className = "mt-3 p-3 rounded-lg text-center font-bold bg-red-50 text-red-600 border-red-200 text-[11px]";
-        resultDiv.innerHTML = `❌ SQUADRA NON TROVATA`;
+        alert("Squadra non trovata.");
+        epicCard.style.display = 'none';
     }
 }
 
-// Avvio automatico
-caricaDatiGoogle();
+inizializzaApp();
+
+
 
 
 
