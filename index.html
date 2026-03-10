@@ -1226,217 +1226,90 @@ body.modal-open { overflow: hidden; }
     </p>
 </footer>
 
-<div id="FaseFinale" class="section hidden pb-32 px-4 pt-6 bg-[#0f172a]">
+<style>
+    /* Reset per evitare sforamenti sui bordi mobile */
+    #FaseFinale, #FaseFinale * { 
+        box-sizing: border-box; 
+        max-width: 100%;
+    }
     
-    <div class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-blue-600 to-indigo-900 p-8 mb-6 shadow-2xl border border-white/10">
-        <div class="relative z-10 text-center">
-            <div class="flex justify-center mb-3">
-                <div class="bg-white/20 backdrop-blur-md p-3 rounded-2xl">
-                    <i class="fas fa-trophy text-3xl text-yellow-400"></i>
-                </div>
-            </div>
-            <h2 class="text-3xl font-black italic tracking-tighter uppercase text-white leading-none">FASE FINALE</h2>
-            <h3 class="text-xl font-black italic text-yellow-400 mt-1 uppercase">FICUP 2025</h3>
-            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-200 mt-4">217 squadre – 5 competizioni ufficiali</p>
-            <div class="mt-4 bg-black/30 rounded-xl p-3 border border-white/5">
-                <p class="text-xs font-bold text-white uppercase italic">
-                    ⚡ Dalla Giornata 29 alla 38 si assegnano tutti i titoli della stagione.
-                </p>
-            </div>
-        </div>
-        <div class="absolute -right-10 -top-10 w-40 h-40 bg-yellow-400/20 rounded-full blur-3xl"></div>
-    </div>
-
-    <div class="bg-white rounded-[24px] p-6 mb-4 shadow-xl border-l-[6px] border-orange-500">
-        <div class="flex items-center gap-3 mb-4">
-            <span class="text-2xl">⭐</span>
-            <h3 class="text-xl font-extrabold text-slate-800 uppercase italic">Coppa All-Star</h3>
-        </div>
-        <div class="space-y-3">
-            <div class="bg-orange-50 p-3 rounded-xl border border-orange-100">
-                <p class="text-[10px] font-black text-orange-600 uppercase mb-1">Status: Competizione élite</p>
-                <p class="text-sm font-bold text-slate-700">👥 16 squadre (Prime classificate di ogni lega)</p>
-            </div>
-            <div class="text-[11px] space-y-2 text-slate-600 font-medium pl-1">
-                <p>📅 <span class="font-bold">G29–G32:</span> Gironi (4 gruppi da 4 – solo andata)</p>
-                <p class="text-orange-600 font-bold">➡️ Passano le prime 2 di ogni girone (8 squadre)</p>
-                <p>📅 <span class="font-bold">G33–G34:</span> Quarti di finale (andata/ritorno)</p>
-                <p>📅 <span class="font-bold">G36:</span> Semifinali (gara secca)</p>
-                <p>📅 <span class="font-bold text-slate-800 italic text-sm">G37: 🏁 Finale</span></p>
-                <p>📅 <span class="font-bold">G38:</span> 🌍 Superfinale Europea</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-[24px] p-6 mb-4 shadow-xl border-l-[6px] border-blue-600">
-        <div class="flex items-center gap-3 mb-4">
-            <span class="text-2xl">🏆</span>
-            <h3 class="text-xl font-extrabold text-slate-800 uppercase italic">Fanta Europa Cup</h3>
-        </div>
-        <div class="space-y-3">
-            <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
-                <p class="text-sm font-bold text-slate-700">👥 64 squadre (Classificate 3ª – 6ª)</p>
-            </div>
-            <div class="text-[11px] space-y-2 text-slate-600 font-medium pl-1">
-                <p>📅 <span class="font-bold">G29–G32:</span> Gironi (16 gruppi da 4 – solo andata)</p>
-                <p class="text-blue-600 font-bold">➡️ Passano le prime 2 di ogni girone (32 squadre)</p>
-                <p>📅 <span class="font-bold">G33–G34:</span> Sedicesimi (gara secca)</p>
-                <p>📅 <span class="font-bold">G35:</span> Ottavi (gara secca)</p>
-                <p>📅 <span class="font-bold">G36:</span> Quarti (gara secca)</p>
-                <p>📅 <span class="font-bold text-slate-800 italic text-sm">G37: 🏁 Finale</span></p>
-                <p>📅 <span class="font-bold">G38:</span> 🌍 Superfinale Europea</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-[24px] p-6 mb-4 shadow-xl border-l-[6px] border-emerald-500">
-        <div class="flex items-center gap-3 mb-4">
-            <span class="text-2xl">⚽</span>
-            <h3 class="text-xl font-extrabold text-slate-800 uppercase italic">Conference Cup</h3>
-        </div>
-        <div class="space-y-3">
-            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
-                <p class="text-sm font-bold text-slate-700">👥 32 squadre (Classificate 7ª – 8ª)</p>
-            </div>
-            <div class="text-[11px] space-y-2 text-slate-600 font-medium pl-1">
-                <p>📅 <span class="font-bold">G29–G32:</span> Gironi (8 gruppi da 4 – solo andata)</p>
-                <p class="text-emerald-600 font-bold">➡️ Passano le prime 2 di ogni girone (16 squadre)</p>
-                <p>📅 <span class="font-bold">G33–G34:</span> Ottavi (andata/ritorno)</p>
-                <p>📅 <span class="font-bold">G35:</span> Quarti (gara secca)</p>
-                <p>📅 <span class="font-bold">G36:</span> Semifinali (gara secca)</p>
-                <p>📅 <span class="font-bold text-slate-800 italic text-sm">G37: 🏁 Finale</span></p>
-                <p>📅 <span class="font-bold">G38:</span> 🌍 Superfinale Europea</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-[24px] p-6 mb-4 shadow-xl border-l-[6px] border-green-700">
-        <div class="flex items-center gap-3 mb-4">
-            <span class="text-2xl">🇮🇹</span>
-            <h3 class="text-xl font-extrabold text-slate-800 uppercase italic leading-none">Torneo Nazionale<br><span class="text-[10px] font-bold text-green-600 tracking-widest">TITOLO UFFICIALE DELLA LEGA</span></h3>
-        </div>
-        <div class="space-y-3">
-            <div class="bg-green-50 p-3 rounded-xl border border-green-100 text-[11px] text-slate-700 leading-tight space-y-1">
-                <p class="font-bold uppercase text-[9px] text-green-800 mb-1">Partecipano 32 squadre:</p>
-                <p>• Prime classificate di ogni lega</p>
-                <p>• Seconde classificate di ogni lega</p>
-                <p>• Vincitore The Gaffer</p>
-                <p>• Miglior punteggio assoluto fase gironi</p>
-                <p class="mt-2 font-black italic">📌 La fase a gironi coincide con la All-Star</p>
-            </div>
-            <div class="text-[11px] space-y-2 text-slate-600 font-medium pl-1">
-                <p>📅 <span class="font-bold text-green-700">G29–G32:</span> Gironi</p>
-                <p>📅 <span class="font-bold">G33:</span> Ottavi</p>
-                <p>📅 <span class="font-bold">G34:</span> Quarti</p>
-                <p>📅 <span class="font-bold">G36:</span> Semifinali</p>
-                <p class="text-green-700 font-black italic text-sm underline decoration-2 decoration-green-300">📅 G37: 🏆 Campione Nazionale FICUP 2025</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-[24px] p-6 mb-4 shadow-xl border-l-[6px] border-red-500">
-        <div class="flex items-center gap-3 mb-4">
-            <span class="text-2xl">🏮</span>
-            <h3 class="text-xl font-extrabold text-slate-800 uppercase italic">Coppa di Lega</h3>
-        </div>
-        <div class="space-y-3">
-            <div class="bg-red-50 p-3 rounded-xl border border-red-100">
-                <p class="text-[10px] font-black text-red-600 uppercase mb-1">Competizione della rivincita</p>
-                <p class="text-sm font-bold text-slate-700">👥 89 squadre (Dall'9° posto in giù)</p>
-            </div>
-            <div class="text-[11px] space-y-2 text-slate-600 font-medium pl-1">
-                <p>📅 <span class="font-bold">G29–G32:</span> Gironi (4 gruppi da 22/23 squadre – solo andata)</p>
-                <p class="text-red-600 font-bold">➡️ Passano le prime 4 di ogni girone (16 squadre)</p>
-                <p>📅 <span class="font-bold">G33:</span> Ottavi | 📅 <span class="font-bold">G34:</span> Quarti</p>
-                <p>📅 <span class="font-bold">G36:</span> Semifinali | 📅 <span class="font-bold text-slate-800 italic text-sm">G37: 🏁 Finale</span></p>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-gradient-to-tr from-slate-900 to-indigo-900 rounded-[28px] p-6 mb-6 text-white shadow-2xl relative overflow-hidden">
-        <div class="relative z-10 text-center mb-6">
-            <h3 class="text-2xl font-black italic uppercase tracking-tighter">GIORNATA 38</h3>
-            <p class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest">Le Sfide Finali</p>
-        </div>
-        
-        <div class="space-y-4 relative z-10">
-            <div class="bg-white/10 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">
-                <h4 class="text-yellow-400 font-black text-xs uppercase mb-2">🥏 Supercoppa di Lega</h4>
-                <p class="text-[11px] font-bold text-white flex items-center justify-between">
-                    <span>🏮 Vinc. Coppa di Lega</span>
-                    <span class="text-yellow-400 mx-2 italic font-black">VS</span>
-                    <span>🇮🇹 Vinc. Nazionale</span>
-                </p>
-            </div>
-            
-            <div class="bg-white/10 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">
-                <h4 class="text-blue-300 font-black text-xs uppercase mb-2">🌍 Superfinale Europea</h4>
-                <p class="text-[10px] mb-3 opacity-80 uppercase tracking-widest font-bold text-center border-b border-white/10 pb-2">Partecipano i 3 Vincitori:</p>
-                <p class="text-[10px] font-bold text-center leading-relaxed">
-                    ⭐ Coppa All-Star | 🏆 Europa Cup | ⚽ Conference Cup
-                </p>
-                <p class="mt-4 text-center text-blue-300 font-black italic">🏆 IL MIGLIOR PUNTEGGIO DIVENTA CAMPIONE D'EUROPA</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-slate-100 rounded-2xl p-4 mb-6 border border-slate-200">
-        <h4 class="text-[11px] font-black text-slate-400 uppercase mb-3 flex items-center gap-2">
-            <i class="fas fa-calendar-check"></i> Vincitori delle Leghe
-        </h4>
-        <div class="space-y-2 text-[11px] font-bold">
-            <p class="text-slate-600 flex justify-between">Ogni lega assegna il titolo: <span>G28</span></p>
-            <div class="p-2 bg-white rounded-lg space-y-1">
-                <p class="flex justify-between text-blue-800 uppercase">Lega A: <span class="font-black">Giornata 37</span></p>
-                <p class="flex justify-between text-indigo-800 uppercase">Lega I: <span class="font-black">Giornata 38</span></p>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-[24px] p-6 mb-6 shadow-xl overflow-hidden relative">
-        <h3 class="text-xl font-black text-slate-800 uppercase italic mb-4">💰 Premi Ufficiali 2025</h3>
-        <table class="w-full text-[12px] font-bold">
-            <tbody class="divide-y divide-slate-100">
-                <tr class="text-blue-600"><td class="py-3">🌍 Campione d’Europa</td><td class="text-right py-3 text-lg">150 cr</td></tr>
-                <tr class="text-green-700"><td class="py-3">🇮🇹 Campione Nazionale</td><td class="text-right py-3 text-lg">120 cr</td></tr>
-                <tr class="text-orange-500"><td class="py-3">⭐ Coppa All-Star</td><td class="text-right py-3 text-lg">70 cr</td></tr>
-                <tr class="text-blue-400"><td class="py-3">🏆 Europa Cup</td><td class="text-right py-3 text-lg">50 cr</td></tr>
-                <tr class="text-indigo-600"><td class="py-3">🥏 Supercoppa di Lega</td><td class="text-right py-3 text-lg">40 cr</td></tr>
-                <tr class="text-emerald-500"><td class="py-3">⚽ Conference Cup</td><td class="text-right py-3 text-lg">35 cr</td></tr>
-                <tr class="text-red-500"><td class="py-3">🏮 Coppa di Lega</td><td class="text-right py-3 text-lg">35 cr</td></tr>
-            </tbody>
-        </table>
-        <div class="mt-4 p-4 bg-slate-900 rounded-xl text-center">
-            <p class="text-yellow-400 text-sm font-black uppercase italic">💰 Totale premi distribuiti: 500 crediti</p>
-            <p class="text-[8px] text-white/50 uppercase mt-1">Utilizzabili nella stagione 2026</p>
-        </div>
-    </div>
-
-    <div class="bg-slate-50 border border-slate-200 rounded-[24px] p-6 mb-8">
-        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">🏅 16 Titoli Ufficiali</h4>
-        <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-slate-600">
-            <p>🌍 Campione d’Europa</p> <p>🇮🇹 Campione Nazionale</p>
-            <p>⭐ Coppa All-Star</p> <p>🏆 Europa Cup</p>
-            <p>⚽ Conference Cup</p> <p>🏮 Coppa di Lega</p>
-            <p>🥏 Supercoppa</p> <p>🏆 Vincitori Leghe</p>
-        </div>
-    </div>
-
-    <div class="text-center py-6 px-4">
-    <p class="text-xs font-black uppercase italic text-white">✅ Tutte le squadre partecipano</p>
-    <p class="text-xs font-black uppercase italic mt-1 text-slate-200">⚔️ 10 giornate di fase finale</p>
-    <div class="h-[2px] w-12 bg-blue-600 mx-auto my-4 rounded-full"></div>
-    <p class="text-[10px] font-black uppercase italic text-white">🏆 Solo i migliori entreranno nella storia della FICUP</p>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
     
-    <button onclick="showSection('Home')" class="mt-8 w-full bg-slate-800 text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">
+    /* Card Squadra: Sfondo bianco, testo Blu originale dal foglio */
+    .squadra-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #ffffff;
+        padding: 12px 16px;
+        border-radius: 12px;
+        margin-bottom: 6px;
+        border: 1px solid #e2e8f0;
+        width: 100%;
+    }
+
+    .nome-squadra {
+        color: #1e3a8a; /* Blu scuro istituzionale */
+        font-weight: 700;
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .tab-attivo {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border-color: #2563eb !important;
+    }
+</style>
+
+<div class="bg-white border-b-2 border-blue-600 p-4 mb-4 text-center">
+    <h2 class="text-xl font-black italic text-blue-900 tracking-tighter">FASE FINALE 2025</h2>
+</div>
+
+<div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar px-4">
+    <button onclick="cambiaTab('Campione Nazionale', this)" class="tab-btn tab-attivo bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-[10px] uppercase whitespace-nowrap border border-blue-600">🇮🇹 Nazionale</button>
+    <button onclick="cambiaTab('All Star', this)" class="tab-btn bg-white text-blue-800 font-bold px-4 py-2 rounded-lg text-[10px] uppercase whitespace-nowrap border border-slate-200">⭐ All Star</button>
+    <button onclick="cambiaTab('Europa Cup', this)" class="tab-btn bg-white text-blue-800 font-bold px-4 py-2 rounded-lg text-[10px] uppercase whitespace-nowrap border border-slate-200">🏆 Europa Cup</button>
+    <button onclick="cambiaTab('Conference Cup', this)" class="tab-btn bg-white text-blue-800 font-bold px-4 py-2 rounded-lg text-[10px] uppercase whitespace-nowrap border border-slate-200">⚽ Conference</button>
+    <button onclick="cambiaTab('Coppa di Lega', this)" class="tab-btn bg-white text-blue-800 font-bold px-4 py-2 rounded-lg text-[10px] uppercase whitespace-nowrap border border-slate-200">🏮 Coppa Lega</button>
+</div>
+
+<div class="px-4 mb-4">
+    <div class="bg-white p-4 rounded-xl shadow-md border border-slate-200">
+        <label class="block text-[10px] font-black text-blue-900 uppercase mb-2">Cerca il tuo team:</label>
+        <div class="flex gap-2">
+            <input type="text" id="inputSquadra" placeholder="Cerca nome..." 
+                class="min-w-0 flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-blue-900 font-bold outline-none focus:border-blue-500">
+            <button onclick="cercaSquadra()" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <div id="risultatoCheck" class="hidden mt-3 p-3 rounded-lg text-center font-bold text-xs border-2"></div>
+    </div>
+</div>
+
+<div class="bg-slate-50 rounded-t-[24px] p-4 border-t border-slate-200 min-h-[300px]">
+    <div class="flex justify-between items-center mb-3">
+        <h4 id="titoloLista" class="text-blue-900 font-black uppercase text-[10px] italic">Iscritti Nazionale</h4>
+    </div>
+    
+    <div id="listaSquadreDinamica">
+        </div>
+</div>
+
+<div class="p-4 bg-slate-50">
+    <button onclick="showSection('Home')" class="w-full bg-blue-900 text-white py-4 rounded-xl font-black uppercase text-sm shadow-lg">
         TORNA ALLA HOMEPAGE
     </button>
 </div>
 
 
-</div>
 
     </div>
+</div>
+
 </div>
 
 
@@ -1634,13 +1507,67 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    else if (name === 'Fanta' || name === 'Azioni') {
+        else if (name === 'Fanta') {
         if (wipContent) {
-            wipContent.style.setProperty('display', 'flex', 'important');
-            if (title) title.innerText = (name === 'Fanta') ? "FANTACALCIO" : "AZIONI RAPIDE";
+            wipContent.innerHTML = ""; // Pulizia totale
+            wipContent.style.setProperty('display', 'block', 'important');
+            wipContent.style.minHeight = '100vh';
+            wipContent.style.background = "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)"; // Sfondo scuro elegante
+
+            wipContent.innerHTML = `
+                <div class="max-w-md mx-auto px-6 py-12 pb-32">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 rounded-full bg-blue-600 shadow-lg shadow-blue-500/50 mb-4">
+                            <i class="fas fa-trophy text-4xl text-white"></i>
+                        </div>
+                        <h1 class="text-4xl font-black text-white tracking-tighter uppercase italic">Il Fanta 8</h1>
+                        <p class="text-blue-400 font-bold text-xs uppercase tracking-[0.2em] mt-2">Official Registration</p>
+                    </div>
+
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-[2.5rem] shadow-2xl">
+                        <h2 class="text-xl font-bold text-white mb-6 text-center">Crea il tuo Account</h2>
+                        
+                        <form id="form-registrazione" class="space-y-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-blue-300 uppercase ml-2">Nome Fantallenatore</label>
+                                <input type="text" id="reg-nome" required placeholder="Es. Mario Rossi" 
+                                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-blue-500 transition-all">
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-blue-300 uppercase ml-2">Nome Squadra</label>
+                                <input type="text" id="reg-squadra" required placeholder="Es. Real Madrink" 
+                                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-blue-500 transition-all">
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-blue-300 uppercase ml-2">Email</label>
+                                <input type="email" id="reg-email" required placeholder="tua@email.it" 
+                                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-blue-500 transition-all">
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-blue-300 uppercase ml-2">Password</label>
+                                <input type="password" id="reg-pass" required placeholder="••••••••" 
+                                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-blue-500 transition-all">
+                            </div>
+
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-600/20 transition-all transform active:scale-95 mt-4 uppercase">
+                                Iscriviti al Torneo
+                            </button>
+                        </form>
+                    </div>
+
+                    <p class="text-center text-slate-500 text-[10px] mt-8 uppercase font-bold tracking-widest">Powered by FIcup & Firebase</p>
+                </div>
+            `;
+
+            // Colleghiamo l'evento di invio
+            document.getElementById('form-registrazione').addEventListener('submit', window.registraPartecipante);
             window.scrollTo(0, 0);
         }
     }
+
 
     // Gestione Sidebar
     const sidebar = document.getElementById('sidebar');
@@ -2968,6 +2895,163 @@ document.addEventListener('submit', async (e) => {
         input.value = ""; citazioneAttiva = null; input.placeholder = "Scrivi un messaggio...";
     }
 });
+// --- LOGICA FANTACALCIO ---
+
+// 1. Funzione per caricare alcuni giocatori di prova (Eseguila una sola volta!)
+window.inizializzaMercato = async () => {
+    const calciatori = [
+        { nome: "Lautaro Martinez", squadra: "Inter", ruolo: "A", prezzo: 38 },
+        { nome: "Kvicha Kvaratskhelia", squadra: "Napoli", ruolo: "A", prezzo: 32 },
+        { nome: "Nicolò Barella", squadra: "Inter", ruolo: "C", prezzo: 22 },
+        { nome: "Gleison Bremer", squadra: "Juventus", ruolo: "D", prezzo: 18 }
+    ];
+
+    for (const c of calciatori) {
+        await addDoc(collection(db, "mercato_calciatori"), c);
+    }
+    alert("Mercato inizializzato!");
+};
+
+// 2. Funzione per acquistare un giocatore
+window.acquistaGiocatore = async (id, nome, ruolo) => {
+    if (!userNick) return alert("Inserisci prima un nickname nella chat!");
+    
+    try {
+        await addDoc(collection(db, "rose_utenti"), {
+            proprietario: userNick,
+            calciatoreId: id,
+            nome: nome,
+            ruolo: ruolo,
+            timestamp: serverTimestamp()
+        });
+        alert(nome + " aggiunto alla tua rosa!");
+    } catch (e) {
+        console.error("Errore acquisto:", e);
+    }
+};
+
+// 3. Listener per vedere il Mercato e la propria Rosa
+const qMercato = query(collection(db, "mercato_calciatori"), orderBy("prezzo", "desc"));
+onSnapshot(qMercato, (snapshot) => {
+    const container = document.getElementById('lista-mercato');
+    if (!container) return;
+    let html = "";
+    snapshot.forEach(docSnap => {
+        const c = docSnap.data();
+        html += `
+            <div class="flex justify-between items-center bg-white p-3 mb-2 rounded-xl shadow-sm border border-slate-100">
+                <div>
+                    <span class="font-bold text-slate-800">${c.nome}</span> 
+                    <span class="text-[10px] bg-slate-200 px-1 rounded text-slate-600">${c.ruolo}</span>
+                    <div class="text-[11px] text-slate-400">${c.squadra}</div>
+                </div>
+                <button onclick="acquistaGiocatore('${docSnap.id}', '${c.nome}', '${c.ruolo}')" 
+                        class="bg-blue-600 text-white text-[11px] px-3 py-1 rounded-full font-bold">
+                    ${c.prezzo} Crediti
+                </button>
+            </div>`;
+    });
+    container.innerHTML = html;
+});
+
+// Listener per la TUA ROSA
+if (userNick) {
+    const qRosa = query(collection(db, "rose_utenti"), orderBy("timestamp", "desc"));
+    onSnapshot(qRosa, (snapshot) => {
+        const container = document.getElementById('tua-rosa');
+        if (!container) return;
+        let html = "";
+        snapshot.forEach(docSnap => {
+            const r = docSnap.data();
+            if (r.proprietario === userNick) {
+                html += `<div class="text-[12px] bg-green-50 p-2 mb-1 rounded border border-green-100">✅ ${r.nome} (${r.ruolo})</div>`;
+            }
+        });
+        container.innerHTML = html || "<p class='text-slate-400 text-xs italic'>Nessun acquisto fatto.</p>";
+    });
+}
+
+</script>
+<script>
+let databaseAttuale = [];
+let foglioCorrente = 'Campione Nazionale';
+const sheetId = '1jLMCn6EgETj-5aYkxUmgYp0BiQNYfj4dwUE5W1uK8Uc';
+
+function cambiaTab(nomeFoglio, btn) {
+    foglioCorrente = nomeFoglio;
+    document.getElementById('titoloLista').innerText = `Iscritti ${nomeFoglio}`;
+    
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('tab-attivo', 'bg-blue-600', 'text-white');
+        b.classList.add('bg-white', 'text-blue-800');
+    });
+    btn.classList.add('tab-attivo');
+
+    caricaDatiGoogle();
+}
+
+function caricaDatiGoogle() {
+    const contenitore = document.getElementById('listaSquadreDinamica');
+    contenitore.innerHTML = "<p class='text-center text-slate-400 py-10'>Caricamento...</p>";
+    
+    const script = document.createElement('script');
+    script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:processData&sheet=${encodeURIComponent(foglioCorrente)}`;
+    document.body.appendChild(script);
+    setTimeout(() => { if(script.parentNode) document.body.removeChild(script); }, 2000);
+}
+
+window.processData = function(json) {
+    const rows = json.table.rows;
+    const contenitore = document.getElementById('listaSquadreDinamica');
+    contenitore.innerHTML = "";
+    databaseAttuale = [];
+
+    rows.forEach((row) => {
+        if (row.c && row.c[0] && row.c[0].v) {
+            const nomeOriginale = row.c[0].v.toString();
+            
+            // Salta intestazioni generiche
+            if (nomeOriginale.toLowerCase() === "team" || nomeOriginale.toLowerCase() === "squadra") return;
+
+            databaseAttuale.push(nomeOriginale);
+
+            const item = document.createElement('div');
+            item.className = "squadra-item";
+            item.innerHTML = `
+                <span class="nome-squadra">${nomeOriginale}</span>
+                <i class="fas fa-check-circle text-blue-500 text-xs"></i>
+            `;
+            contenitore.appendChild(item);
+        }
+    });
+};
+
+function cercaSquadra() {
+    const query = document.getElementById('inputSquadra').value.trim().toLowerCase();
+    const resultDiv = document.getElementById('risultatoCheck');
+    
+    if (query.length < 2) return;
+
+    // Cerca nel database ignorando maiuscole/minuscole nella ricerca, 
+    // ma recuperando il nome originale trovato
+    const trovata = databaseAttuale.find(s => s.toLowerCase().includes(query));
+
+    resultDiv.classList.remove('hidden');
+    if (trovata) {
+        resultDiv.className = "mt-3 p-3 rounded-lg text-center font-bold bg-blue-50 text-blue-600 border-blue-200 text-[11px]";
+        resultDiv.innerHTML = `✅ ${trovata} <br> TROVATA IN ${foglioCorrente.toUpperCase()}`;
+    } else {
+        resultDiv.className = "mt-3 p-3 rounded-lg text-center font-bold bg-red-50 text-red-600 border-red-200 text-[11px]";
+        resultDiv.innerHTML = `❌ SQUADRA NON TROVATA`;
+    }
+}
+
+// Avvio automatico
+caricaDatiGoogle();
+
+
+
+
 </script>
 
 
@@ -3058,6 +3142,23 @@ document.addEventListener('submit', async (e) => {
         <div id="gaffer-loader" class="absolute inset-0 flex items-center justify-center bg-[#0f172a] text-blue-400 font-bold uppercase text-[10px] tracking-widest animate-pulse">
             Caricamento...
         </div>
+        <div id="section-Fanta" class="section-content hidden p-4 pb-24">
+    <h2 class="text-2xl font-black mb-4 uppercase text-slate-800">Mercato Live ⚽</h2>
+    
+    <div id="lista-mercato" class="space-y-3 mb-8">
+        <p class="text-slate-400 italic text-sm text-center">Caricamento mercato...</p>
+    </div>
+
+    <h2 class="text-2xl font-black mb-4 uppercase text-blue-600">La Mia Rosa 📋</h2>
+    <div id="tua-rosa" class="bg-white border-2 border-dashed border-slate-200 p-4 rounded-3xl min-h-[150px]">
+        <p class="text-slate-400 text-xs italic text-center">Nessun acquisto fatto.</p>
+    </div>
+
+    <button onclick="inizializzaMercato()" class="mt-10 w-full text-[10px] text-slate-300 uppercase tracking-widest border border-slate-200 py-2 rounded-lg">
+        Inizializza Database Mercato
+    </button>
+</div>
+
     </div>
 </div>
 
