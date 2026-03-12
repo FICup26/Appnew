@@ -1301,6 +1301,8 @@ body.modal-open { overflow: hidden; }
 }
 
 </style>
+<div id="FaseFinale" style="display:none;"> 
+
 
 <div class="search-container">
     <div class="search-wrapper">
@@ -1446,155 +1448,62 @@ document.addEventListener('DOMContentLoaded', () => {
        function showSection(name) {
     const homeContent = document.getElementById('home-content');
     const wipContent = document.getElementById('wip-content');
-    const title = document.getElementById('wip-title');
-    const faseFinale = document.getElementById('FaseFinale'); // Recupera il regolamento
-    
-    // Seleziona tutto ciò che appartiene alla Home
+    const faseFinale = document.getElementById('FaseFinale');
     const extraHome = document.querySelectorAll('.glass-card, .mercato-wrapper, .stadium-viewport, .social-box-container, footer, #match-container, .hero-section');
 
-    // 1. NASCONDI TUTTO (Reset totale)
-    if (homeContent) homeContent.style.setProperty('display', 'none', 'important');
-    if (wipContent) wipContent.style.setProperty('display', 'none', 'important');
-    if (faseFinale) faseFinale.style.setProperty('display', 'none', 'important');
+    // RESET TOTALE
+    [homeContent, wipContent, faseFinale].forEach(el => { if (el) el.style.setProperty('display', 'none', 'important'); });
     extraHome.forEach(el => el.style.setProperty('display', 'none', 'important'));
 
-    // 2. LOGICA DI VISUALIZZAZIONE
     if (name === 'Home') {
         if (homeContent) homeContent.style.display = 'block';
         extraHome.forEach(el => el.style.display = 'block');
-        window.scrollTo(0, 0);
     } 
-    
     else if (name === 'FaseFinale') {
-        if (faseFinale) {
-            faseFinale.style.setProperty('display', 'block', 'important');
-            window.scrollTo(0, 0);
-        }
+        if (faseFinale) faseFinale.style.display = 'block';
     }
-
-    else if (name === 'Classifiche' || name === 'Classifica Schedina') {
-        if (wipContent) {
-            wipContent.style.setProperty('display', 'block', 'important'); 
-            wipContent.style.minHeight = '100vh';
-            wipContent.innerHTML = `
-                <div class="max-w-md mx-auto px-4 py-8">
-                    <h2 class="text-2xl font-black text-center text-blue-800 mb-6 uppercase tracking-tight">🏆 Ranking FantaSchedina</h2>
-                    <div id="classifica-generale-full" class="w-full text-center py-20">Caricamento...</div>
-                    <button onclick="showSection('Home')" class="mt-10 mb-20 w-full bg-gray-800 text-white py-4 rounded-2xl font-bold">TORNA ALLA HOME</button>
-                </div>`;
-            caricaClassificaInSezione();
-        }
-    }
-    
-        else if (name === 'Pronostici') {
+    else if (name === 'Fanta') {
         if (wipContent) {
             wipContent.style.setProperty('display', 'block', 'important');
-            wipContent.style.minHeight = '100vh';
-            wipContent.style.backgroundColor = '#f8fafc';
-
-            // Dobbiamo rimettere l'HTML completo che la funzione si aspetta
-            wipContent.innerHTML = `
-                <div class="max-w-md mx-auto px-4 py-8">
-                    <h2 class="text-2xl font-black text-center text-blue-800 mb-2 uppercase italic">I Pronostici</h2>
-                    
-                    <div class="flex items-center justify-center gap-3 mb-6 bg-white p-3 rounded-2xl shadow-sm border border-blue-50">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase">Filtra:</label>
-                        <select id="select-giornata" onchange="caricaPronosticiCompleti(this.value)" class="bg-transparent font-black text-blue-700 outline-none">
-                            <option value="">Caricamento...</option>
-                            ${Array.from({length: 38}, (_, i) => `<option value="${i+1}">Giornata ${i+1}</option>`).join('')}
-                        </select>
-                    </div>
-                    
-                    <div id="statistiche-pronostici" class="mb-4 text-center"></div>
-                    <div id="lista-pronostici" class="space-y-4 text-center py-10 text-blue-500 font-bold">
-                        <i class="fas fa-spinner animate-spin mr-2"></i> Sincronizzazione in corso...
-                    </div>
-
-                    <button onclick="showSection('Home')" class="mt-10 mb-20 w-full bg-gray-800 text-white py-4 rounded-2xl font-bold shadow-lg">
-                        TORNA ALLA HOME
-                    </button>
-                </div>
-            `;
+            wipContent.style.background = "linear-gradient(180deg, #93c5fd 0%, #eff6ff 100%)";
+            wipContent.style.minHeight = "100vh";
             
-            // Ora che gli ID 'select-giornata' e 'lista-pronostici' esistono nel DOM, chiamiamo il fetch
-            if (typeof caricaPronosticiCompleti === "function") {
-                caricaPronosticiCompleti(); 
-            } else {
-                console.error("Errore: la funzione caricaPronosticiCompleti non esiste!");
-            }
-        }
-    }
-
-
-        else if (name === 'Fanta') {
-        if (wipContent) {
-            wipContent.innerHTML = ""; // Pulizia totale
-            wipContent.style.setProperty('display', 'block', 'important');
-            wipContent.style.minHeight = '100vh';
-            wipContent.style.background = "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)"; // Sfondo scuro elegante
-
             wipContent.innerHTML = `
-                <div class="max-w-md mx-auto px-6 py-12 pb-32">
-                    <div class="text-center mb-10">
-                        <div class="inline-block p-4 rounded-full bg-blue-600 shadow-lg shadow-blue-500/50 mb-4">
-                            <i class="fas fa-trophy text-4xl text-white"></i>
-                        </div>
-                        <h1 class="text-4xl font-black text-white tracking-tighter uppercase italic">Il Fanta 8</h1>
-                        <p class="text-blue-400 font-bold text-xs uppercase tracking-[0.2em] mt-2">Official Registration</p>
+                <div class="max-w-md mx-auto px-6 py-12 pb-32 flex flex-col items-center">
+                    <div class="text-center mb-8">
+                        <h1 class="text-4xl font-black text-white drop-shadow-md uppercase">
+                            IL FANTA <span class="block text-6xl italic" style="background: linear-gradient(to bottom, #fde047 0%, #ca8a04 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Playfair Display', serif;">otto</span>
+                        </h1>
                     </div>
 
-                    <div class="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-[2.5rem] shadow-2xl">
-                        <h2 class="text-xl font-bold text-white mb-6 text-center">Crea il tuo Account</h2>
-                        
-                        <form id="form-registrazione" class="space-y-4">
-                            <div>
-                                <label class="text-[10px] font-bold text-blue-300 uppercase ml-2">Nome Fantallenatore</label>
-                                <input type="text" id="reg-nome" required placeholder="Es. Mario Rossi" 
-                                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-blue-500 transition-all">
-                            </div>
+                    <div class="w-full bg-white/90 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-white">
+                        <div class="flex bg-slate-100 rounded-2xl p-1 mb-8">
+                            <button onclick="toggleFantaAuth('login')" id="btn-tab-login" class="w-1/2 py-3 rounded-xl font-bold text-xs uppercase bg-white shadow-sm text-blue-600 transition-all">Accedi</button>
+                            <button onclick="toggleFantaAuth('signup')" id="btn-tab-signup" class="w-1/2 py-3 rounded-xl font-bold text-xs uppercase text-slate-400 transition-all">Registrati</button>
+                        </div>
 
-                            <div>
-                                <label class="text-[10px] font-bold text-blue-300 uppercase ml-2">Nome Squadra</label>
-                                <input type="text" id="reg-squadra" required placeholder="Es. Real Madrink" 
-                                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-blue-500 transition-all">
-                            </div>
+                        <form id="form-login" class="space-y-4">
+                            <input type="email" id="login-email" required placeholder="Email" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none focus:border-blue-500 transition-all">
+                            <input type="password" id="login-pass" required placeholder="Password" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none focus:border-blue-500 transition-all">
+                            <button type="submit" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg uppercase text-xs mt-4">Entra in Squadra</button>
+                        </form>
 
-                            <div>
-                                <label class="text-[10px] font-bold text-blue-300 uppercase ml-2">Email</label>
-                                <input type="email" id="reg-email" required placeholder="tua@email.it" 
-                                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-blue-500 transition-all">
-                            </div>
-
-                            <div>
-                                <label class="text-[10px] font-bold text-blue-300 uppercase ml-2">Password</label>
-                                <input type="password" id="reg-pass" required placeholder="••••••••" 
-                                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-blue-500 transition-all">
-                            </div>
-
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-600/20 transition-all transform active:scale-95 mt-4 uppercase">
-                                Iscriviti al Torneo
-                            </button>
+                        <form id="form-registrazione" class="space-y-4 hidden">
+                            <input type="text" id="reg-nome" required placeholder="Nome Fantallenatore" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none">
+                            <input type="text" id="reg-squadra" required placeholder="Nome Squadra" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none">
+                            <input type="email" id="reg-email" required placeholder="Email" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none">
+                            <input type="password" id="reg-pass" required placeholder="Crea Password" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none">
+                            <button type="submit" class="w-full bg-blue-500 text-white font-black py-5 rounded-2xl shadow-lg uppercase text-xs mt-4">Crea Account</button>
                         </form>
                     </div>
-
-                    <p class="text-center text-slate-500 text-[10px] mt-8 uppercase font-bold tracking-widest">Powered by FIcup & Firebase</p>
-                </div>
-            `;
-
-            // Colleghiamo l'evento di invio
+                </div>`;
+            
             document.getElementById('form-registrazione').addEventListener('submit', window.registraPartecipante);
-            window.scrollTo(0, 0);
+            document.getElementById('form-login').addEventListener('submit', window.loginPartecipante);
         }
     }
-
-
-    // Gestione Sidebar
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar && sidebar.classList.contains('open')) {
-        toggleSidebar(); 
-    }
+    window.scrollTo(0, 0);
 }
-
 
 
 
@@ -2757,10 +2666,16 @@ function getLogoSquadra(nome) {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { 
+    getAuth, 
+    signInAnonymously, 
+    createUserWithEmailAndPassword, // AGGIUNTO
+    signInWithEmailAndPassword,    // AGGIUNTO
+    onAuthStateChanged             // AGGIUNTO per monitorare il login
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { 
     getFirestore, collection, addDoc, onSnapshot, serverTimestamp, 
-    query, orderBy, doc, updateDoc, arrayUnion 
+    query, orderBy, doc, updateDoc, arrayUnion, setDoc // AGGIUNTO setDoc
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -2775,6 +2690,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
 
 let userNick = localStorage.getItem('ficup_chat_nick') || "";
 let isChatVisible = false;
@@ -2989,6 +2905,155 @@ if (userNick) {
         container.innerHTML = html || "<p class='text-slate-400 text-xs italic'>Nessun acquisto fatto.</p>";
     });
 }
+
+// Switch tra i form
+window.toggleFantaAuth = (mode) => {
+    const isLogin = mode === 'login';
+    document.getElementById('form-login').classList.toggle('hidden', !isLogin);
+    document.getElementById('form-registrazione').classList.toggle('hidden', isLogin);
+    document.getElementById('btn-tab-login').className = isLogin ? "w-1/2 py-3 rounded-xl font-bold text-xs uppercase bg-white shadow-sm text-blue-600" : "w-1/2 py-3 rounded-xl font-bold text-xs uppercase text-slate-400";
+    document.getElementById('btn-tab-signup').className = !isLogin ? "w-1/2 py-3 rounded-xl font-bold text-xs uppercase bg-white shadow-sm text-blue-600" : "w-1/2 py-3 rounded-xl font-bold text-xs uppercase text-slate-400";
+};
+
+// Funzione REGISTRAZIONE
+// --- FUNZIONE REGISTRAZIONE COMPLETA ---
+window.registraPartecipante = async (e) => {
+    e.preventDefault();
+    const nome = document.getElementById('reg-nome').value;
+    const squadra = document.getElementById('reg-squadra').value;
+    const email = document.getElementById('reg-email').value;
+    const pass = document.getElementById('reg-pass').value;
+
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        await setDoc(doc(db, "partecipanti_fanta", userCredential.user.uid), {
+            nome, squadra, email, data: new Date().toISOString()
+        });
+
+        // QUI METTIAMO LA GRAFICA MOZZAFIATO
+        document.getElementById('wip-content').innerHTML = `
+            <div class="max-w-md mx-auto px-6 py-10 min-h-[85vh] flex flex-col items-center justify-center animate-bounce-in">
+                <div class="relative mb-10">
+                    <div class="absolute inset-0 bg-yellow-400 blur-[40px] opacity-40"></div>
+                    <div class="relative w-28 h-28 bg-gradient-to-br from-yellow-300 via-orange-500 to-yellow-600 rounded-[2rem] flex items-center justify-center shadow-2xl border-2 border-white/60 transform -rotate-6">
+                        <i class="fas fa-trophy text-5xl text-white"></i>
+                    </div>
+                </div>
+                <div class="w-full bg-white/10 backdrop-blur-2xl border border-white/30 p-10 rounded-[3.5rem] shadow-2xl text-center">
+                    <h2 class="text-3xl font-black text-white mb-6 uppercase italic tracking-tighter">
+                        GRAZIE PER <br><span class="text-yellow-400">ESSERTI REGISTRATO!</span>
+                    </h2>
+                    <p class="text-blue-50 font-medium mb-8">
+                        Prossimamente scoprirai il nuovo <br>
+                        <span class="text-white text-2xl font-black tracking-widest">FANTA OTTO</span>
+                    </p>
+                    <div class="py-4 border-y border-white/10 mb-8">
+                        <p class="text-yellow-100 text-xs font-bold uppercase tracking-[0.2em] animate-pulse">
+                            📱 Attendendo l'ufficialità nel gruppo WhatsApp
+                        </p>
+                    </div>
+                    <button onclick="showSection('Home')" class="w-full bg-white text-blue-900 font-black py-5 rounded-2xl shadow-xl uppercase text-[11px] tracking-[0.3em]">
+                        Torna alla Homepage
+                    </button>
+                </div>
+            </div>
+            <style>
+                @keyframes bounce-in {
+                    0% { opacity: 0; transform: scale(0.9) translateY(30px); }
+                    100% { opacity: 1; transform: scale(1) translateY(0); }
+                }
+                .animate-bounce-in { animation: bounce-in 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+            </style>
+        `;
+    } catch (error) { alert("Errore: " + error.message); }
+};
+
+// --- FUNZIONE LOGIN COMPLETA ---
+// --- 1. FUNZIONE REGISTRAZIONE COMPLETA ---
+window.registraPartecipante = async (e) => {
+    e.preventDefault();
+    const nome = document.getElementById('reg-nome').value;
+    const squadra = document.getElementById('reg-squadra').value;
+    const email = document.getElementById('reg-email').value;
+    const pass = document.getElementById('reg-pass').value;
+
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        await setDoc(doc(db, "partecipanti_fanta", userCredential.user.uid), {
+            nome, squadra, email, data: new Date().toISOString()
+        });
+
+        // Appena finisce di salvare, mostra la schermata stilosa
+        window.mostraSchermataWIP();
+
+    } catch (error) { alert("Errore: " + error.message); }
+};
+
+// --- 2. FUNZIONE LOGIN COMPLETA ---
+window.loginPartecipante = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const pass = document.getElementById('login-pass').value;
+
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        
+        // Appena accede, mostra la schermata stilosa
+        window.mostraSchermataWIP();
+
+    } catch (error) { alert("Errore Accesso: " + error.message); }
+};
+
+// --- 3. LA SCHERMATA MOZZAFIATO (La logica del design) ---
+window.mostraSchermataWIP = () => {
+    document.getElementById('wip-content').innerHTML = `
+        <link href="https://fonts.googleapis.com/css2?family=Style+Script&display=swap" rel="stylesheet">
+        
+        <div class="max-w-md mx-auto px-6 py-10 min-h-[85vh] flex flex-col items-center justify-center animate-fade-up">
+            
+            <div class="absolute w-64 h-64 bg-white/30 blur-[100px] rounded-full -z-10"></div>
+
+            <div class="w-full bg-white/40 backdrop-blur-2xl border border-white/40 p-10 rounded-[3.5rem] shadow-2xl text-center relative">
+                
+                <p class="text-blue-900 font-black text-[9px] uppercase tracking-[0.5em] mb-6 opacity-60">Work In Progress</p>
+                
+                <h2 class="text-2xl font-bold text-blue-900 leading-tight mb-2">
+                    Il nuovo torneo <br> sta per iniziare 
+                </h2>
+                
+                
+
+                <div class="space-y-6">
+                    <p class="text-blue-800 font-bold text-base leading-relaxed italic">
+                        "Grazie per esserti registrato. <br> Stiamo curando ogni dettaglio del nuovo Fanta8."
+                    </p>
+                    
+                    <div class="bg-blue-600/20 rounded-2xl p-6 border border-blue-600/10 shadow-inner">
+                        <p class="text-blue-900 text-[11px] font-black uppercase tracking-widest leading-loose">
+                            📱 Attendi l'ufficialità <br>nel gruppo WhatsApp
+                        </p>
+                    </div>
+                </div>
+
+                <button onclick="showSection('Home')" 
+                    class="mt-12 w-full bg-blue-900 text-white font-black py-5 rounded-2xl shadow-2xl hover:bg-blue-800 active:scale-95 transition-all uppercase text-[10px] tracking-[0.3em]">
+                    Torna alla Homepage
+                </button>
+            </div>
+            
+            <p class="mt-8 text-[8px] font-bold text-blue-900/40 uppercase tracking-[0.8em]">Ficup 26/27</p>
+        </div>
+
+        <style>
+            @keyframes fade-up {
+                from { opacity: 0; transform: translateY(40px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .animate-fade-up { animation: fade-up 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        </style>
+    `;
+};
+
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
