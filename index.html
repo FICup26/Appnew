@@ -1451,7 +1451,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const faseFinale = document.getElementById('FaseFinale');
     const extraHome = document.querySelectorAll('.glass-card, .mercato-wrapper, .stadium-viewport, .social-box-container, footer, #match-container, .hero-section');
 
-    // 1. Reset totale visibilità
+    // 1. Reset totale visibilità (Nascondiamo tutto)
     [homeContent, wipContent, faseFinale].forEach(el => { 
         if(el) el.style.setProperty('display', 'none', 'important'); 
     });
@@ -1463,6 +1463,13 @@ document.addEventListener('DOMContentLoaded', () => {
         extraHome.forEach(el => el.style.display = 'block');
     } 
     
+    // AGGIUNTO: Gestione Tab Fase Finale
+    else if (name === 'Fase Finale' || name === 'FaseFinale') {
+        if(faseFinale) {
+            faseFinale.style.setProperty('display', 'block', 'important');
+        }
+    }
+
     else if (name === 'Classifica Schedina' || name === 'Classifiche') {
         wipContent.style.setProperty('display', 'block', 'important');
         wipContent.style.background = "#f8fafc";
@@ -1483,8 +1490,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="mb-6">
                     <select id="select-giornata" onchange="caricaPronosticiCompleti(this.value)" 
                             class="w-full p-4 rounded-2xl bg-white border-2 border-emerald-100 shadow-sm font-bold text-emerald-800 outline-none">
-                        <option value="tutte"> Tutte le Giornate (Totale)</option>
-                        ${Array.from({length: 38}, (_, i) => `<option value="${i+1}"> Giornata ${i+1}</option>`).join('')}
+                        <option value="tutte">📊 Tutte le Giornate (Totale)</option>
+                        ${Array.from({length: 38}, (_, i) => `<option value="${i+1}">⚽ Giornata ${i+1}</option>`).join('')}
                     </select>
                 </div>
                 <div id="statistiche-pronostici" class="mb-4"></div>
@@ -1499,9 +1506,8 @@ document.addEventListener('DOMContentLoaded', () => {
         wipContent.style.minHeight = "100vh";
         
         if (typeof auth !== 'undefined' && auth.currentUser) {
-            mostraSchermataWIP();
+            if(typeof mostraSchermataWIP === "function") mostraSchermataWIP();
         } else {
-            // RIPRISTINO GRAFICA ORO E BLU
             wipContent.innerHTML = `
                 <div class="max-w-md mx-auto px-6 py-12 pb-32 flex flex-col items-center">
                     <div class="text-center mb-8">
