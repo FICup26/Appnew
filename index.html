@@ -1451,57 +1451,95 @@ document.addEventListener('DOMContentLoaded', () => {
     const faseFinale = document.getElementById('FaseFinale');
     const extraHome = document.querySelectorAll('.glass-card, .mercato-wrapper, .stadium-viewport, .social-box-container, footer, #match-container, .hero-section');
 
-    // RESET TOTALE
-    [homeContent, wipContent, faseFinale].forEach(el => { if (el) el.style.setProperty('display', 'none', 'important'); });
+    // 1. Reset totale visibilità
+    [homeContent, wipContent, faseFinale].forEach(el => { 
+        if(el) el.style.setProperty('display', 'none', 'important'); 
+    });
     extraHome.forEach(el => el.style.setProperty('display', 'none', 'important'));
 
+    // 2. Logica di attivazione sezioni
     if (name === 'Home') {
-        if (homeContent) homeContent.style.display = 'block';
+        if(homeContent) homeContent.style.display = 'block';
         extraHome.forEach(el => el.style.display = 'block');
     } 
-    else if (name === 'FaseFinale') {
-        if (faseFinale) faseFinale.style.display = 'block';
+    
+    else if (name === 'Classifica Schedina' || name === 'Classifiche') {
+        wipContent.style.setProperty('display', 'block', 'important');
+        wipContent.style.background = "#f8fafc";
+        wipContent.innerHTML = `
+            <div class="px-4 py-10">
+                <h2 class="text-2xl font-black text-blue-800 uppercase italic mb-6 text-center tracking-tighter">Classifica Generale</h2>
+                <div id="classifica-generale-full"></div>
+            </div>`;
+        if(typeof caricaClassificaInSezione === "function") caricaClassificaInSezione();
     }
-    else if (name === 'Fanta') {
-        if (wipContent) {
-            wipContent.style.setProperty('display', 'block', 'important');
-            wipContent.style.background = "linear-gradient(180deg, #93c5fd 0%, #eff6ff 100%)";
-            wipContent.style.minHeight = "100vh";
-            
+
+    else if (name === 'Pronostici Schedina' || name === 'Pronostici') {
+        wipContent.style.setProperty('display', 'block', 'important');
+        wipContent.style.background = "#f8fafc";
+        wipContent.innerHTML = `
+            <div class="px-4 py-10">
+                <h2 class="text-2xl font-black text-emerald-700 uppercase italic mb-4 text-center tracking-tighter">Pronostici</h2>
+                <div class="mb-6">
+                    <select id="select-giornata" onchange="caricaPronosticiCompleti(this.value)" 
+                            class="w-full p-4 rounded-2xl bg-white border-2 border-emerald-100 shadow-sm font-bold text-emerald-800 outline-none">
+                        <option value="tutte"> Tutte le Giornate (Totale)</option>
+                        ${Array.from({length: 38}, (_, i) => `<option value="${i+1}"> Giornata ${i+1}</option>`).join('')}
+                    </select>
+                </div>
+                <div id="statistiche-pronostici" class="mb-4"></div>
+                <div id="lista-pronostici"></div>
+            </div>`;
+        if(typeof caricaPronosticiCompleti === "function") caricaPronosticiCompleti();
+    }
+
+    else if (name === 'Fanta' || name === 'Fanta8') {
+        wipContent.style.setProperty('display', 'block', 'important');
+        wipContent.style.background = "linear-gradient(180deg, #1e40af 0%, #3b82f6 100%)";
+        wipContent.style.minHeight = "100vh";
+        
+        if (typeof auth !== 'undefined' && auth.currentUser) {
+            mostraSchermataWIP();
+        } else {
+            // RIPRISTINO GRAFICA ORO E BLU
             wipContent.innerHTML = `
                 <div class="max-w-md mx-auto px-6 py-12 pb-32 flex flex-col items-center">
                     <div class="text-center mb-8">
-                        <h1 class="text-4xl font-black text-white drop-shadow-md uppercase">
-                            IL FANTA <span class="block text-6xl italic" style="background: linear-gradient(to bottom, #fde047 0%, #ca8a04 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Playfair Display', serif;">otto</span>
+                        <h1 class="text-4xl font-black text-white drop-shadow-md uppercase tracking-tighter">
+                            IL FANTA <span class="block text-6xl italic" style="background: linear-gradient(to bottom, #fde047 0%, #ca8a04 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: serif;">otto</span>
                         </h1>
                     </div>
-
-                    <div class="w-full bg-white/90 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-white">
-                        <div class="flex bg-slate-100 rounded-2xl p-1 mb-8">
-                            <button onclick="toggleFantaAuth('login')" id="btn-tab-login" class="w-1/2 py-3 rounded-xl font-bold text-xs uppercase bg-white shadow-sm text-blue-600 transition-all">Accedi</button>
-                            <button onclick="toggleFantaAuth('signup')" id="btn-tab-signup" class="w-1/2 py-3 rounded-xl font-bold text-xs uppercase text-slate-400 transition-all">Registrati</button>
+                    
+                    <div class="w-full bg-white/95 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-white">
+                        <div class="flex bg-slate-100 rounded-2xl p-1 mb-8 border border-slate-200">
+                            <button onclick="toggleFantaAuth('login')" id="btn-tab-login" class="w-1/2 py-3 rounded-xl font-bold text-[10px] uppercase bg-white shadow-sm text-blue-600 transition-all">Accedi</button>
+                            <button onclick="toggleFantaAuth('signup')" id="btn-tab-signup" class="w-1/2 py-3 rounded-xl font-bold text-[10px] uppercase text-slate-400 transition-all">Registrati</button>
                         </div>
 
-                        <form id="form-login" class="space-y-4">
-                            <input type="email" id="login-email" required placeholder="Email" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none focus:border-blue-500 transition-all">
-                            <input type="password" id="login-pass" required placeholder="Password" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none focus:border-blue-500 transition-all">
-                            <button type="submit" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg uppercase text-xs mt-4">Entra in Squadra</button>
+                        <form id="form-login" onsubmit="loginPartecipante(event)" class="space-y-4">
+                            <input type="email" id="login-email" required placeholder="Email" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none font-bold text-sm">
+                            <input type="password" id="login-pass" required placeholder="Password" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none font-bold text-sm">
+                            <button type="submit" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg uppercase text-[11px] mt-4">Entra in Squadra</button>
                         </form>
 
-                        <form id="form-registrazione" class="space-y-4 hidden">
-                            <input type="text" id="reg-nome" required placeholder="Nome Fantallenatore" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none">
-                            <input type="text" id="reg-squadra" required placeholder="Nome Squadra" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none">
-                            <input type="email" id="reg-email" required placeholder="Email" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none">
-                            <input type="password" id="reg-pass" required placeholder="Crea Password" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none">
-                            <button type="submit" class="w-full bg-blue-500 text-white font-black py-5 rounded-2xl shadow-lg uppercase text-xs mt-4">Crea Account</button>
+                        <form id="form-registrazione" onsubmit="registraPartecipante(event)" class="hidden space-y-4">
+                            <input type="text" id="reg-nome" required placeholder="Nome Reale" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none font-bold text-sm">
+                            <input type="text" id="reg-squadra" required placeholder="Nome Squadra" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none font-bold text-sm">
+                            <input type="email" id="reg-email" required placeholder="Email" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none font-bold text-sm">
+                            <input type="password" id="reg-pass" required placeholder="Crea Password" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none font-bold text-sm">
+                            <button type="submit" class="w-full bg-blue-500 text-white font-black py-5 rounded-2xl shadow-lg uppercase text-[11px] mt-4">Crea Account</button>
                         </form>
                     </div>
                 </div>`;
-            
-            document.getElementById('form-registrazione').addEventListener('submit', window.registraPartecipante);
-            document.getElementById('form-login').addEventListener('submit', window.loginPartecipante);
         }
     }
+
+    // 3. Chiudi Sidebar e Overlay
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    if(sidebar) sidebar.classList.remove('open');
+    if(overlay) overlay.style.display = 'none';
+
     window.scrollTo(0, 0);
 }
 
