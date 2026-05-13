@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FICup 26/27 | Official App</title>
@@ -1305,6 +1306,11 @@ body.modal-open { overflow: hidden; }
     
     <!-- Contenitore Raccoglitore Principale -->
     <div class="raccoglitore-finale">
+        <!-- Inseriscilo sopra il titolo -->
+<div id="timer" style="color: #ef4444; font-weight: 900; font-size: 14px; margin-bottom: 10px; letter-spacing: 1px;">
+    CARICAMENTO TIMER...
+</div>
+
         
         <!-- Titolo Lampeggiante -->
         <h1 class="titolo-finale">LA FINALISSIMA</h1>
@@ -1337,6 +1343,18 @@ body.modal-open { overflow: hidden; }
                 <div id="barraPork" class="bar-fill orange-bar" style="width: 50%;"></div>
             </div>
         </div>
+        <div id="lastVoteBox" style="font-size: 10px; color: #64748b; margin-top: 10px; font-style: italic;">
+    🕒 In attesa del prossimo voto...
+</div>
+<!-- Pulsante Condividi WhatsApp -->
+<div style="margin-top: 20px; text-align: center;">
+    <button onclick="condividiSuWhatsApp()" style="background: #25D366; color: white; border: none; padding: 10px 20px; border-radius: 50px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin: auto; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);">
+        <i class="fab fa-whatsapp" style="font-size: 16px;"></i> 
+        CONDIVIDI SFIDA LIVE
+    </button>
+</div>
+
+
     </div>
 </div>
 
@@ -1456,6 +1474,31 @@ body.modal-open { overflow: hidden; }
     font-size: 20px;
     text-transform: uppercase;
 }
+/* Aggiungi questo al tuo CSS */
+.vs-animato {
+    font-size: 24px;
+    font-weight: 900;
+    color: #ef4444;
+    animation: battito 0.8s infinite alternate;
+    display: inline-block;
+    margin: 0 10px;
+}
+
+@keyframes battito {
+    from { transform: scale(1); filter: drop-shadow(0 0 2px red); }
+    to { transform: scale(1.2); filter: drop-shadow(0 0 8px red); }
+}
+#timer {
+    animation: pulseTimer 1s infinite;
+    text-shadow: 0 0 5px rgba(239, 68, 68, 0.3);
+}
+
+@keyframes pulseTimer {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
 </style>
 
 
@@ -1463,7 +1506,7 @@ body.modal-open { overflow: hidden; }
 <script type="module">
   // Import Firebase
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
       apiKey: "AIzaSyAWMmt7lrRF1V6AIpQWh2CwXZE88_w_8E0",
@@ -1478,31 +1521,35 @@ body.modal-open { overflow: hidden; }
   const db = getFirestore(app);
   const votiCol = collection(db, "voti_finale");
 
-  // Funzione globale per il voto
+  // --- 1. FUNZIONE GLOBALE PER IL VOTO ---
   window.inviaVoto = async function(squadra) {
       console.log("Votazione avviata per:", squadra);
+      
+      // Vibrazione (Mobile)
+      if (navigator.vibrate) navigator.vibrate(100);
 
-      // --- 1. EFFETTI IMMEDIATI (Così non hai lo schermo bianco) ---
+      // Effetto Coriandoli Immediato
       try {
           if (typeof confetti === 'function') {
               confetti({
-                  particleCount: 150,
-                  spread: 70,
+                  particleCount: 180,
+                  spread: 80,
                   origin: { y: 0.6 },
-                  zIndex: 10001 // Deve essere sopra tutto
+                  zIndex: 10001,
+                  colors: ['#3b82f6', '#f59e0b', '#ffffff']
               });
           }
       } catch(err) { console.error("Errore coriandoli:", err); }
 
+      // Mostra Popup "Ottima Scelta"
       const popup = document.getElementById('popupOttimaScelta');
       const confermaTesto = document.getElementById('confermaSquadra');
-      
       if (popup) {
           if (confermaTesto) confermaTesto.innerText = squadra;
-          popup.style.display = 'flex'; // Mostra il popup
+          popup.style.display = 'flex';
       }
 
-      // --- 2. SALVATAGGIO FIREBASE (In background) ---
+      // Salvataggio su Firebase
       try {
           await addDoc(votiCol, {
               scelta: squadra,
@@ -1512,22 +1559,28 @@ body.modal-open { overflow: hidden; }
           console.error("Errore Firebase:", e);
       }
 
-      // --- 3. CHIUSURA AUTOMATICA ---
+      // Chiudi popup dopo 2 secondi
       setTimeout(() => {
           if (popup) popup.style.display = 'none';
       }, 2000);
   };
 
-  // Listener per le statistiche in tempo reale
-  onSnapshot(votiCol, (snapshot) => {
+  // --- 2. LISTENER STATISTICHE E ULTIMO VOTO (In Tempo Reale) ---
+  // Ordiniamo per data per beccare davvero l'ultimo voto arrivato
+  const qVoti = query(votiCol, orderBy("data", "asc"));
+
+  onSnapshot(qVoti, (snapshot) => {
       let vaffa = 0, pork = 0;
+      
       snapshot.forEach(doc => {
           if (doc.data().scelta === 'Vaffangirona') vaffa++;
           else pork++;
       });
+
       const tot = vaffa + pork;
       const pV = tot === 0 ? 50 : Math.round((vaffa/tot)*100);
       
+      // Aggiornamento Barre e Percentuali
       const bV = document.getElementById('barraVaffa');
       const bP = document.getElementById('barraPork');
       if(bV) bV.style.width = pV + "%";
@@ -1540,7 +1593,80 @@ body.modal-open { overflow: hidden; }
       
       const totLabel = document.getElementById('totalVotesLabel');
       if(totLabel) totLabel.innerText = `VOTI TOTALI: ${tot}`;
+
+      // LOGICA ULTIMO VOTO (Prende l'ultimo dell'array ordinato)
+      if (!snapshot.empty) {
+          const lastVoteData = snapshot.docs[snapshot.docs.length - 1].data();
+          const lastVoteBox = document.getElementById('lastVoteBox');
+          if (lastVoteBox && lastVoteData.scelta) {
+              lastVoteBox.innerText = `🔥 Qualcuno ha appena votato ${lastVoteData.scelta}!`;
+              // Piccolo effetto flash al cambio testo
+              lastVoteBox.style.opacity = "0.5";
+              setTimeout(() => lastVoteBox.style.opacity = "1", 200);
+          }
+      }
   });
+
+  // --- 3. LOGICA COUNTDOWN (Fuori dal listener per stabilità) ---
+  function avviaCountdown(scadenza) {
+      const timerElement = document.getElementById("timer");
+      if (!timerElement) return;
+
+      const interval = setInterval(() => {
+          const ora = new Date().getTime();
+          const dist = scadenza - ora;
+
+          if (dist <= 0) {
+              clearInterval(interval);
+              timerElement.innerHTML = "🏁 <span style='color: #ef4444;'>VOTAZIONI CHIUSE</span> 🏁";
+              // Disabilita pulsanti se chiuse
+              document.querySelectorAll('[onclick*="inviaVoto"]').forEach(btn => btn.style.pointerEvents = 'none');
+              return;
+          }
+
+          const giorni = Math.floor(dist / (1000 * 60 * 60 * 24));
+          const ore = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minuti = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+          const secondi = Math.floor((dist % (1000 * 60)) / 1000);
+
+          timerElement.innerHTML = `
+              <span style="font-size: 10px; color: #64748b; display: block; margin-bottom: 2px; font-weight:bold;">SCADENZA TRA:</span>
+              <span style="letter-spacing: 1px; font-weight: 900;">
+                  ${giorni > 0 ? giorni + "g " : ""}${ore}h ${minuti}m ${secondi}s
+              </span>
+          `;
+      }, 1000);
+  }
+
+  // DATA DI SCADENZA: 17 MAGGIO 2026, ORE 12:30:59
+  const scadenzaTarget = new Date(2026, 4, 17, 12, 30, 59).getTime(); 
+  avviaCountdown(scadenzaTarget);
+  window.condividiSuWhatsApp = function() {
+    // 1. Recupero dati reali (fallback al 50% se vuoti)
+    const pVaffa = document.getElementById('percVaffa')?.innerText || "50%";
+    const pPork = document.getElementById('percPork')?.innerText || "50%";
+    const votiTot = document.getElementById('totalVotesLabel')?.innerText || "Votazione in corso";
+
+    // 2. Link diretto pulito
+    const urlVoto = "https://ficup26.github.io/Appnew/index.html#";
+
+    // 3. Creazione messaggio (Emoji e Formattazione WhatsApp)
+    const testo = 
+        `🏆 *FINALE FICUP 2026* 🏆\n\n` +
+        `🔥 *Vaffangirona* 🔵 VS 🟠 *B. Porkmund*\n\n` +
+        `📊 *SITUAZIONE LIVE:*\n` +
+        `🔹 Vaffa: *${pVaffa}*\n` +
+        `🔸 Porkmund: *${pPork}*\n\n` +
+        `🗳️ ${votiTot}\n\n` +
+        `🚀 *Vieni a decidere la finale qui:* 👇\n` +
+        `${urlVoto}`;
+
+    // 4. Apertura WhatsApp
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(testo)}`;
+    window.open(waUrl, '_blank');
+};
+
+
 </script>
 
 
