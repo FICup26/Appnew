@@ -1301,37 +1301,251 @@ body.modal-open { overflow: hidden; }
 }
 
 </style>
-<div id="FaseFinale" style="display:none;"> 
+<div id="FaseFinale" style="display:block; padding: 20px 10px; max-width: 450px; margin: auto;">
+    
+    <!-- Contenitore Raccoglitore Principale -->
+    <div class="raccoglitore-finale">
+        
+        <!-- Titolo Lampeggiante -->
+        <h1 class="titolo-finale">LA FINALISSIMA</h1>
+        
+        <!-- Voti Totali Blu -->
+        <div id="totalVotesContainer" style="margin-bottom: 20px;">
+            <span id="totalVotesLabel" class="voti-totali-badge">VOTI TOTALI: 0</span>
+        </div>
 
+        <!-- Box Scelta Orizzontali -->
+        <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+            <div onclick="window.inviaVoto('Vaffangirona')" class="box-team vaffa-grad">
+                <span>VAFFANGIRONA</span>
+            </div>
+            
+            <div onclick="window.inviaVoto('Borussia Porkmund')" class="box-team pork-grad">
+                <span>B. PORKMUND</span>
+            </div>
+        </div>
 
-<div class="search-container">
-    <div class="search-wrapper">
-        <input type="text" id="inputSquadra" placeholder="Cerca la tua squadra...">
-        <button onclick="ricercaGlobale()" class="btn-search">
-            <i class="fas fa-search"></i>
-        </button>
+        <!-- Barra Statistiche Live -->
+        <div class="stats-panel">
+            <div class="stats-header">
+                <span id="percVaffa">50%</span>
+                <span style="color: #94a3b8; letter-spacing: 1px;">LIVE STATS</span>
+                <span id="percPork">50%</span>
+            </div>
+            <div class="progress-container">
+                <div id="barraVaffa" class="bar-fill blue-bar" style="width: 50%;"></div>
+                <div id="barraPork" class="bar-fill orange-bar" style="width: 50%;"></div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div id="epicResult" class="epic-card" style="display:none; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 25px; border-radius: 20px; text-align: center; margin: 15px;">
-    <div class="text-4xl mb-2">🏆</div>
-    <h2 id="epicTeam" class="text-2xl font-black uppercase text-white mb-1"></h2>
-    <div id="containerRisultati"></div>
+<!-- Popup Esplosivo -->
+<div id="popupOttimaScelta" class="overlay-ottima">
+    <div class="popup-box">
+        <h1 style="font-size: 50px; margin: 0;">🚀</h1>
+        <h2 style="color: #1e293b; font-weight: 900; margin: 10px 0;">OTTIMA SCELTA!</h2>
+        <p id="confermaSquadra" class="text-squadra"></p>
+    </div>
 </div>
 
-<div class="tabs-scroll-wrapper">
-    <button onclick="cambiaTab('Campione Nazionale', this)" class="tab-btn tab-active">🇮🇹 NAZIONALE</button>
-    <button onclick="cambiaTab('All Star', this)" class="tab-btn">⭐ ALL STAR</button>
-    <button onclick="cambiaTab('Europa Cup', this)" class="tab-btn">🏆 EUROPA</button>
-    <button onclick="cambiaTab('Conference Cup', this)" class="tab-btn">⚽ CONFERENCE</button>
-    <button onclick="cambiaTab('Coppa di Lega', this)" class="tab-btn">🏮 LEGA</button>
-</div>
+<style>
+/* Raccoglitore Principale */
+.raccoglitore-finale {
+    background: #ffffff;
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    text-align: center;
+    border: 1px solid #e2e8f0;
+}
 
-<div id="listaSquadreDinamica" class="px-5 pb-20"></div>
+/* Titolo Lampeggiante */
+.titolo-finale {
+    font-size: 28px;
+    font-weight: 950;
+    margin-bottom: 5px;
+    animation: lampeggio 1.5s infinite;
+    text-transform: uppercase;
+}
 
-</div>
+@keyframes lampeggio {
+    0% { color: #3b82f6; text-shadow: 0 0 5px #3b82f6; }
+    33% { color: #ef4444; text-shadow: 0 0 10px #ef4444; }
+    66% { color: #f59e0b; text-shadow: 0 0 5px #f59e0b; }
+    100% { color: #3b82f6; text-shadow: 0 0 5px #3b82f6; }
+}
 
-</div>
+/* Badge Voti Blu */
+.voti-totali-badge {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 6px 15px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 800;
+    border: 1px solid #3b82f6;
+    display: inline-block;
+}
+
+/* Box Squadre */
+.box-team {
+    flex: 1;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    cursor: pointer;
+    color: white;
+    font-size: 11px;
+    font-weight: 900;
+    transition: all 0.2s ease;
+}
+.box-team:active { transform: scale(0.92); }
+.vaffa-grad { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+.pork-grad { background: linear-gradient(135deg, #d97706, #f59e0b); }
+
+/* Pannello Statistiche */
+.stats-panel {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 15px;
+}
+.stats-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 900;
+    color: #1e293b;
+    margin-bottom: 10px;
+}
+.progress-container {
+    height: 12px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    display: flex;
+    overflow: hidden;
+}
+.bar-fill { transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+.blue-bar { background: #3b82f6; }
+.orange-bar { background: #f59e0b; }
+
+/* Popup */
+.overlay-ottima {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255,255,255,0.9);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(8px);
+}
+.popup-box {
+    text-align: center;
+    animation: scoppio 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes scoppio {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.text-squadra {
+    color: #3b82f6;
+    font-weight: 900;
+    font-size: 20px;
+    text-transform: uppercase;
+}
+</style>
+
+
+<!-- Caricamento libreria Coriandoli (se non l'hai già) -->
+<script type="module">
+  // Import Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+      apiKey: "AIzaSyAWMmt7lrRF1V6AIpQWh2CwXZE88_w_8E0",
+      authDomain: "ficup-c9186.firebaseapp.com",
+      projectId: "ficup-c9186",
+      storageBucket: "ficup-c9186.firebasestorage.app",
+      messagingSenderId: "825031993621",
+      appId: "1:825031993621:web:f9b49d210864a8c26f611c"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const votiCol = collection(db, "voti_finale");
+
+  // Funzione globale per il voto
+  window.inviaVoto = async function(squadra) {
+      console.log("Votazione avviata per:", squadra);
+
+      // --- 1. EFFETTI IMMEDIATI (Così non hai lo schermo bianco) ---
+      try {
+          if (typeof confetti === 'function') {
+              confetti({
+                  particleCount: 150,
+                  spread: 70,
+                  origin: { y: 0.6 },
+                  zIndex: 10001 // Deve essere sopra tutto
+              });
+          }
+      } catch(err) { console.error("Errore coriandoli:", err); }
+
+      const popup = document.getElementById('popupOttimaScelta');
+      const confermaTesto = document.getElementById('confermaSquadra');
+      
+      if (popup) {
+          if (confermaTesto) confermaTesto.innerText = squadra;
+          popup.style.display = 'flex'; // Mostra il popup
+      }
+
+      // --- 2. SALVATAGGIO FIREBASE (In background) ---
+      try {
+          await addDoc(votiCol, {
+              scelta: squadra,
+              data: serverTimestamp()
+          });
+      } catch (e) {
+          console.error("Errore Firebase:", e);
+      }
+
+      // --- 3. CHIUSURA AUTOMATICA ---
+      setTimeout(() => {
+          if (popup) popup.style.display = 'none';
+      }, 2000);
+  };
+
+  // Listener per le statistiche in tempo reale
+  onSnapshot(votiCol, (snapshot) => {
+      let vaffa = 0, pork = 0;
+      snapshot.forEach(doc => {
+          if (doc.data().scelta === 'Vaffangirona') vaffa++;
+          else pork++;
+      });
+      const tot = vaffa + pork;
+      const pV = tot === 0 ? 50 : Math.round((vaffa/tot)*100);
+      
+      const bV = document.getElementById('barraVaffa');
+      const bP = document.getElementById('barraPork');
+      if(bV) bV.style.width = pV + "%";
+      if(bP) bP.style.width = (100 - pV) + "%";
+      
+      const pVLabel = document.getElementById('percVaffa');
+      const pPLabel = document.getElementById('percPork');
+      if(pVLabel) pVLabel.innerText = pV + "%";
+      if(pPLabel) pPLabel.innerText = (100 - pV) + "%";
+      
+      const totLabel = document.getElementById('totalVotesLabel');
+      if(totLabel) totLabel.innerText = `VOTI TOTALI: ${tot}`;
+  });
+</script>
+
+
+
+
 
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md h-20 nav-shadow z-50">
@@ -1353,7 +1567,7 @@ body.modal-open { overflow: hidden; }
     <button onclick="showSection('FaseFinale')" class="w-14 h-14 bg-gradient-to-tr from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg text-white text-2xl active:scale-90 transition-all">
         <i class="fas fa-trophy"></i>
     </button>
-    <span class="text-[10px] font-bold uppercase text-gray-700">Fase Finale</span>
+    <span class="text-[10px] font-bold uppercase text-gray-700">Finale</span>
 </div>
 
 
@@ -1713,50 +1927,49 @@ async function caricaFormazioni() {
     } catch (e) { container.innerHTML = "<p class='text-center w-full text-xs text-red-500 font-bold'>ERRORE CARICAMENTO</p>"; }
 }
 
-// 3. Funzione Scarica (Adattata per la tua App)
+// FUNZIONE SCARICA PERFEZIONATA PER PIXEL-PERFECT (LOGHI DRITTI E TESTI ALLINEATI)
 async function scaricaMatch(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    
-    // Feedback visivo
-    const originalContent = el.innerHTML;
-    el.innerHTML = "<div class='py-20 text-center font-bold text-blue-600 animate-bounce'>GENERAZIONE...</div>";
+    const elInterno = document.getElementById(id);
+    if (!elInterno) return;
+
+    // Risaliamo alla card bianca per avere tutti i titoli e le ombre (come l'app)
+    const el = elInterno.closest('.bg-white') || elInterno;
+
+    // Feedback visivo solo sull'opacità del tasto (non tocchiamo l'HTML dei giocatori!)
+    const btn = event ? event.currentTarget : null;
+    if (btn) btn.style.opacity = "0.5";
 
     try {
-        const clone = el.cloneNode(true);
-        // Applichiamo lo stile "Poster" al clone per il download
-        Object.assign(clone.style, {
-            width: "800px",
-            padding: "40px",
-            background: "radial-gradient(circle at center, #1b0050 0%, #6200ff 40%, #ff0095 100%)",
-            color: "#fff",
-            borderRadius: "0px",
-            position: "fixed",
-            left: "-9999px"
+        // PERFEZIONAMENTO: Misuriamo le dimensioni reali della card a schermo
+        const rettangolo = el.getBoundingClientRect();
+
+        const canvas = await html2canvas(el, {
+            scale: 3,                 // Qualità 4K per i loghi
+            useCORS: true,            // Fondamentale per vedere i loghi esterni
+            allowTaint: false,
+            backgroundColor: "#f1f5f9", // Sfondo grigino dell'app per stacco card
+            logging: false,
+            
+            // FORZIAMO LE DIMENSIONI ESATTE MATEMATICAMENTE (RISOLVE TUTTO)
+            width: rettangolo.width,  // Larghezza reale al pixel
+            height: rettangolo.height,// Altezza reale al pixel
+            windowWidth: rettangolo.width, // Simula che la finestra sia larga quanto la card
+            windowHeight: rettangolo.height // Simula che la finestra sia alta quanto la card
         });
-        
-        // Pulizia icone/VS per l'immagine pulita
-        clone.querySelectorAll("img, .cursor-pointer").forEach(n => n.remove());
 
-        document.body.appendChild(clone);
-        const canvas = await html2canvas(clone, { scale: 2 });
-        document.body.removeChild(clone);
-
+        // Generiamo il download
         const link = document.createElement("a");
-        link.download = `formazione_${el.dataset.home}.png`;
-        link.href = canvas.toDataURL("image/png");
+        const titoloMatch = el.querySelector('h3')?.innerText || "Formazione";
+        link.download = `Fanta8_Match_${titoloMatch.replace(/\s+/g, '_')}.png`;
+        link.href = canvas.toDataURL("image/png", 1.0);
         link.click();
-    } catch (err) { alert("Errore download"); }
-    
-    el.innerHTML = originalContent;
-}
 
-// Inserisci queste chiamate dentro l'evento DOMContentLoaded già esistente
-document.addEventListener('DOMContentLoaded', () => {
-    initTitoloFormazioni();
-    caricaFormazioni();
-    // ... le tue altre funzioni (caricaPartite, ecc) ...
-});
+    } catch (err) {
+        console.error("Errore generazione immagine:", err);
+    } finally {
+        if (btn) btn.style.opacity = "1";
+    }
+}
 
 function renderMaghettoLine(id, players) {
     const container = document.getElementById(id);
@@ -3103,87 +3316,41 @@ window.mostraSchermataWIP = () => {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-const sheetId = '1jLMCn6EgETj-5aYkxUmgYp0BiQNYfj4dwUE5W1uK8Uc';
-const configCoppe = {
-    'Campione Nazionale': "Complimenti sei tra i migliori! Supera gli ostacoli e diventa il CAMPIONE ASSOLUTO! 🏆",
-    'All Star': "Sei una stella tra le stelle. Illumina il campo e dimostra il tuo talento galattico! ⭐",
-    'Europa Cup': "L'Europa ti guarda. Conquista il continente, la gloria ti aspetta! 🌍",
-    'Conference Cup': "Ogni partita è una battaglia. Dimostra il tuo valore e alza la coppa al cielo! ⚽",
-    'Coppa di Lega': "Non demordere! Scala la classifica e prenditi la rivincita alla giornata 38! 🔥"
-};
-
-let databaseSquadre = {};
-
-function inizializzaApp() {
-    Object.keys(configCoppe).forEach(nome => {
-        const script = document.createElement('script');
-        const callbackName = `cb_${nome.replace(/\s/g, '')}`;
-        script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:${callbackName}&sheet=${encodeURIComponent(nome)}`;
-        document.body.appendChild(script);
-
-        window[callbackName] = function(data) {
-            databaseSquadre[nome] = data.table.rows
-                .map(r => r.c[0] ? r.c[0].v.toString() : null)
-                .filter(n => n && n.toLowerCase() !== 'team');
-            if (nome === 'Campione Nazionale') aggiornaLista('Campione Nazionale');
-        };
-    });
-}
-
-function aggiornaLista(nome) {
-    const container = document.getElementById('listaSquadreDinamica');
-    const lista = databaseSquadre[nome] || [];
-    container.innerHTML = lista.map(s => `
-        <div class="squadra-item" style="background:white; margin:6px 0; padding:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-            <span style="color:#1e3a8a; font-weight:800; text-transform:uppercase; font-size:13px;">${s}</span>
-            <i class="fas fa-check-circle text-blue-500" style="font-size:10px;"></i>
-        </div>
-    `).join('');
-}
-
-function cambiaTab(nome, btn) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-    btn.classList.add('tab-active');
-    aggiornaLista(nome);
-    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-}
-
-function ricercaGlobale() {
-    const query = document.getElementById('inputSquadra').value.trim().toLowerCase();
-    const epicCard = document.getElementById('epicResult');
-    const container = document.getElementById('containerRisultati');
-    
-    if (query.length < 2) return;
-    
-    container.innerHTML = ""; 
-    let trovata = false;
-    let nomeSquadraTrovata = "";
-
-    for (let coppa in databaseSquadre) {
-        const match = databaseSquadre[coppa].find(s => s.toLowerCase().includes(query));
-        if (match) {
-            nomeSquadraTrovata = match;
-            container.innerHTML += `
-                <div class="msg-blue-box">
-                    <small style="color:#2563eb; font-weight:900; display:block; margin-bottom:4px;">${coppa.toUpperCase()}</small>
-                    ${configCoppe[coppa]}
-                </div>`;
-            trovata = true;
-        }
+// Funzione per gestire il voto
+function vota(squadra) {
+    // 1. Effetto coriandoli (richiede canvas-confetti.js)
+    if (typeof confetti === 'function') {
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#fbbf24', '#3b82f6', '#ffffff']
+        });
     }
 
-    if (trovata) {
-        document.getElementById('epicTeam').innerText = nomeSquadraTrovata;
-        epicCard.style.display = 'block';
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#fbbf24', '#ffffff', '#3b82f6'] });
-        epicCard.scrollIntoView({ behavior: 'smooth' });
-    } else {
-        alert("Squadra non trovata.");
-        epicCard.style.display = 'none';
-    }
-}
+    // 2. Mostra Popup
+    const popup = document.getElementById('popupVoto');
+    const msg = document.getElementById('msgConferma');
+    msg.innerText = "Hai votato per il " + squadra;
+    popup.classList.remove('popup-hidden');
+    popup.classList.add('popup-visible');
 
-inizializzaApp();
+    // 3. Salvataggio su Firebase 
+    // Assumendo che 'db' sia la tua istanza Firestore
+    if (typeof db !== 'undefined') {
+        db.collection("voti_finale").add({
+            squadra_scelta: squadra,
+            data: new Date().toLocaleString(),
+            user_agent: navigator.userAgent
+        }).catch(err => console.log("Errore Firebase: ", err));
+    }
+
+    // 4. Nascondi popup dopo 3 secondi
+    setTimeout(() => {
+        popup.classList.remove('popup-visible');
+        popup.classList.add('popup-hidden');
+    }, 3000);
+}
 
 
 
