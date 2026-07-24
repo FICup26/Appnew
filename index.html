@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     
-    <!-- Meta per PWA -->
+    <!-- Meta per PWA e Colore Header -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#2563eb"> <!-- Colore del tuo header -->
+    <meta name="theme-color" content="#2563eb">
+
+    <!-- Backup in caso il JavaScript sia lento -->
+    <meta http-equiv="refresh" content="0;url=https://ficup-26-27.ai.studio">
 
     <title>FICup</title>
     
@@ -18,13 +21,22 @@
     </script>
 
     <style>
-        /* Questo serve a colorare lo sfondo sotto la barra mentre carica */
         body { 
             background-color: #2563eb; 
             margin: 0; 
             height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: sans-serif;
+            font-weight: bold;
         }
     </style>
 </head>
-<body></body>
+<body>
+    <div style="text-align: center;">
+        <p>Apertura FICup Web App...</p>
+    </div>
+</body>
 </html>
